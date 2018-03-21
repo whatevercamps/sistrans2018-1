@@ -33,7 +33,7 @@ public class Cliente {
 	/**
 	 * Apellido de un cliente
 	 */	
-	@JsonProperty(value="Apelllido")
+	@JsonProperty(value="Apellido")
 	protected String Apellido;
 	/**
 	 * Define la relacion con la entidad tiene que ser alguno de los siguientes:Estudiante; Egresado, Empleado,Profesores,PadresDeEstudiante,ProfesoresInvitados

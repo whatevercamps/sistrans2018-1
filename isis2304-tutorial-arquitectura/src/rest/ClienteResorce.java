@@ -66,55 +66,6 @@ public class ClienteResorce {
 	}
 
 
-	@POST
-	@Path("{id: \\d+}/pedido")
-	@Produces( { MediaType.APPLICATION_JSON } )
-	public Response agregarPedido(@PathParam("id") Long id, @QueryParam("idProd") Long idProd, @QueryParam("idRest") Long idRestProd) throws SQLException, Exception {
-		AlohAndesTM tm = new AlohAndesTM(getPath());
-
-		Restaurante res = tm.darRestaurante(idRestProd);
-		if(res == null) {
-			return Response.status( 404 ).entity( "{ \"ERROR\": \""+ "NO SE ENCUENTRA EL RESTAURANTE" + "\"}" ).build( );
-		}
-
-		Cliente cliente = tm.darCliente(id);
-		if(cliente == null) {
-			return Response.status( 404 ).entity( "{ \"ERROR\": \""+ "NO SE ENCUENTRA EL CLIENTE" + "\"}" ).build( );
-		}
-
-		Producto prod = tm.darProducto(idProd, idRestProd);
-		if(prod == null) {
-			return Response.status( 404 ).entity( "{ \"ERROR\": \""+ "NO SE ENCUENTRA EL PRODUCTO" + "\"}" ).build( );
-		}
-
-		try {
-			Pedido pedido = tm.agregarPedido(cliente, prod, res);
-
-			return Response.status( 200 ).entity( pedido ).build();	
-		}catch( Exception e )
-		{
-			return Response.status( 500 ).entity( doErrorMessage( e ) ).build( );
-		}
-	}
-	 
-
-	@POST
-	@Path("{id: \\d+}/pedidos")
-	@Consumes(MediaType.APPLICATION_JSON)
-	@Produces( MediaType.APPLICATION_JSON )
-	public Response agregarPedidos(@PathParam("id") Long id, RequestBody request) throws SQLException, Exception {
-		AlohAndesTM tm = new AlohAndesTM(getPath());
-
-		try {
-			List<Pedido> pedidosMesa = tm.agregarPedidosMesa(id, request.idsPedidos);
-
-			return Response.status( 200 ).entity( pedidosMesa ).build();	
-		}catch( Exception e )
-		{
-			return Response.status( 500 ).entity( doErrorMessage( e ) ).build( );
-		}
-	}
-
 
 
 }

@@ -161,7 +161,7 @@ public class AlohAndesTM {
 		try {
 			
 			//verificar reglas de negocio
-			if (buscarClientePorId(cliente.getCodigo()) == null) {
+			if (buscarClientePorId(cliente.getCodigo()) != null) {
 				throw new Exception("Ya hay un cliente con ese código");
 			}
 			
@@ -170,6 +170,7 @@ public class AlohAndesTM {
 			
 			dao.crearCliente(cliente);
 			
+			System.out.println("lo creo");
 			//verificar 
 			
 			ret = buscarClientePorId(cliente.getCodigo());

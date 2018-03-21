@@ -74,7 +74,7 @@ public class DAOTablaClientes {
 			Long id2 = rsClientePorId.getLong("ID");
 			String nombreClientePorId = rsClientePorId.getString("NOMBRE");
 			String apellidoClientePorId = rsClientePorId.getString("APELLIDO");
-			Integer tipo = rsClientePorId.getInt("TIPO");
+			Integer tipo = rsClientePorId.getInt("AFILIACION");
 			clientePorId = new Cliente(id2, nombreClientePorId, apellidoClientePorId, tipo, null);
 
 		}
@@ -85,7 +85,7 @@ public class DAOTablaClientes {
 
 	public void crearCliente(Cliente cliente) throws SQLException, Exception {
 		
-		String sql = String.format("INSERT INTO CLIENTES(ID, NOMBRE, APELLIDO, AFILIACION) VALUES (%1$s, %2$s, %3$s, %4$s)",
+		String sql = String.format("INSERT INTO CLIENTES(ID, NOMBRE, APELLIDO, AFILIACION) VALUES ('%1$s', '%2$s', '%3$s', '%4$s')",
 														cliente.getCodigo(),
 														cliente.getNombre(),
 														cliente.getApellido(),

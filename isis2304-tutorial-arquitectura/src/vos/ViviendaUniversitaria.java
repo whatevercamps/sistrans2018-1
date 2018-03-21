@@ -10,7 +10,7 @@ import org.codehaus.jackson.annotate.JsonProperty;
  */
 
 
-public class ViviendaUniversitaria extends Operadores
+public class ViviendaUniversitaria extends Operador
 {
 	/**
 	 * Servicio de sala de estudio si su valor es 0 no tiene costo adicional

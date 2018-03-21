@@ -28,8 +28,8 @@ import vos.Cliente;
  * @author David Bautista
  */
 
-@Path("clientes")
-public class ClienteResorce {
+@Path("reservas")
+public class ReservaResource {
 
 	@XmlRootElement
 	public static class RequestBody {
@@ -54,8 +54,10 @@ public class ClienteResorce {
 	public Response crearCliente( Cliente cliente) throws SQLException, Exception{
 		System.out.println("entreeeeee");
 		AlohAndesTM tm = new AlohAndesTM(getPath());
+		
 		try {
 			Cliente clienteNew = tm.crearCliente(cliente);
+
 			return Response.status( 200 ).entity( clienteNew ).build();	
 		}catch( Exception e )
 		{

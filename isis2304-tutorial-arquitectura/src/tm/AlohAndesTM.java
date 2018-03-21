@@ -21,9 +21,11 @@ import java.util.Properties;
 
 import com.sun.xml.internal.bind.v2.model.core.ID;
 
+import dao.DAOTablaApartamentos;
 import dao.DAOTablaClientes;
-
+import vos.Apartamento;
 import vos.Cliente;
+import vos.Operador;
 
 
 /**
@@ -158,6 +160,55 @@ public class AlohAndesTM {
 
 		DAOTablaClientes dao = new DAOTablaClientes();
 		Cliente ret = null;
+		try {
+			
+			//verificar reglas de negocio
+			if (buscarClientePorId(cliente.getCodigo()) != null) {
+				throw new Exception("Ya hay un cliente con ese código");
+			}
+			
+			this.conn = darConexion();
+			dao.setConn(conn);
+			
+			dao.crearCliente(cliente);
+			
+			System.out.println("lo creo");
+			//verificar 
+			
+			ret = buscarClientePorId(cliente.getCodigo());
+			
+			if(ret == null) {
+				throw new Exception("No se guardó correctamente el cliente, revisar xd...");
+			}
+
+			
+
+
+		}  catch (SQLException e) {
+			System.err.println("SQLException:" + e.getMessage());
+			e.printStackTrace();
+			throw e;
+		} catch (Exception e) {
+			System.err.println("GeneralException:" + e.getMessage());
+			e.printStackTrace();
+			throw e;
+		}finally {
+			try {
+				dao.cerrarRecursos();
+				if(this.conn!=null)
+					this.conn.close();
+			} catch (SQLException exception) {
+				System.err.println("SQLException closing resources:" + exception.getMessage());
+				exception.printStackTrace();
+				throw exception;
+			}
+		}
+		return ret;
+	}
+
+	public Apartamento crearOperadorApartamento(Operador operador) {
+		DAOTablaApartamentos dao = new DAOTablaApartamentos();
+		Apartamento ret = null;
 		try {
 			
 			//verificar reglas de negocio

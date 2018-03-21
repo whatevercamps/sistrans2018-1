@@ -18,7 +18,9 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import tm.AlohAndesTM;
+import vos.Apartamento;
 import vos.Cliente;
+import vos.Operador;
 
 
 
@@ -28,13 +30,8 @@ import vos.Cliente;
  * @author David Bautista
  */
 
-@Path("clientes")
-public class ClienteResorce {
-
-	@XmlRootElement
-	public static class RequestBody {
-		@XmlElement Long[][] idsPedidos;
-	}
+@Path("operadores")
+public class OperadorResource {
 
 
 	@Context
@@ -51,16 +48,20 @@ public class ClienteResorce {
 	@POST
 	@Consumes({ MediaType.APPLICATION_JSON } )
 	@Produces({ MediaType.APPLICATION_JSON } )
-	public Response crearCliente( Cliente cliente) throws SQLException, Exception{
-		System.out.println("entreeeeee");
+	public Response crearOperador(Operador operador) throws SQLException, Exception{
 		AlohAndesTM tm = new AlohAndesTM(getPath());
-		try {
-			Cliente clienteNew = tm.crearCliente(cliente);
-			return Response.status( 200 ).entity( clienteNew ).build();	
-		}catch( Exception e )
+		
+		if(operador.getTipo() == Operador.APARTAMENTO)
 		{
-			return Response.status( 500 ).entity( doErrorMessage( e ) ).build( );
+			try {
+				Apartamento ret = tm.crearOperadorApartamento(operador);
+				return Response.status( 200 ).entity( ret ).build();	
+			}catch( Exception e )
+			{
+				return Response.status( 500 ).entity( doErrorMessage( e ) ).build( );
+			}
 		}
+		
 	}
 
 

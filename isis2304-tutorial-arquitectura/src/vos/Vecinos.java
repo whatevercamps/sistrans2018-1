@@ -9,7 +9,7 @@ import org.codehaus.jackson.annotate.JsonProperty;
  * -Posee una vivienda la cual es presentada en una propuesta 
  */
 
-public class Vecinos extends Operadores
+public class Vecinos extends Operador
 {
 	//Atributos
 	/**

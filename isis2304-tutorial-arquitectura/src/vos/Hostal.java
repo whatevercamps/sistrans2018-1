@@ -3,7 +3,7 @@ import java.util.Date;
 
 import org.codehaus.jackson.annotate.JsonProperty;
 import java.time.LocalDateTime;
-public class Hostal extends Operadores
+public class Hostal extends Operador
 {
 	
 	@JsonProperty(value="HoraApertura")

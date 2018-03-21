@@ -41,7 +41,7 @@ public class Propuesta
 	 * 
 	 */
 	@JsonProperty(value="Operador")
-	protected Operadores Operador;	
+	protected Operador Operador;	
 	/**
 	 * Representa la lista de servicios adicionales asociadas con una propuesta 
 	 * 
@@ -54,7 +54,7 @@ public class Propuesta
 
 	///Constructor
 
-	public Propuesta(@JsonProperty(value="Operador") Operadores operador,@JsonProperty(value="id")Long id,
+	public Propuesta(@JsonProperty(value="Operador") Operador operador,@JsonProperty(value="id")Long id,
 			@JsonProperty(value="Nombre") String nombre,@JsonProperty(value="costo") double costo,
 			@JsonProperty(value="Tipo") int tipo,@JsonProperty(value="reserva") Reserva reservaA)
 	{
@@ -83,11 +83,11 @@ public class Propuesta
 	 * 
 	 * @param myOperador nuevo operador  responsable de la propuesta
 	 */
-	public void basicSetOperador(Operadores myOperador) {
+	public void basicSetOperador(Operador myOperador) {
 		if (this.Operador != myOperador) {
 			if (myOperador != null){
 				if (this.Operador != myOperador) {
-					Operadores oldOperador = this.Operador;
+					Operador oldOperador = this.Operador;
 					this.Operador = myOperador;
 					if (oldOperador != null)
 						oldOperador.removePropuestas(this);
@@ -102,7 +102,7 @@ public class Propuesta
 	 * 
 	 * @return el operador relacionado con la propuesta
 	 */
-	public Operadores getOperador() {
+	public Operador getOperador() {
 		return this.Operador;
 	}
 
@@ -154,7 +154,7 @@ public class Propuesta
 
 
 
-	public void setOperador(Operadores myOperador) {
+	public void setOperador(Operador myOperador) {
 		this.basicSetOperador(myOperador);
 		myOperador.addPropuestas(this);
 	}
@@ -172,7 +172,7 @@ public class Propuesta
 	public void unsetOperador() {
 		if (this.Operador == null)
 			return;
-		Operadores oldOperador = this.Operador;
+		Operador oldOperador = this.Operador;
 		this.Operador = null;
 		oldOperador.removePropuestas(this);
 	}

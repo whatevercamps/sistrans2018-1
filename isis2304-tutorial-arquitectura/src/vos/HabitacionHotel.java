@@ -2,7 +2,7 @@ package vos;
 
 import org.codehaus.jackson.annotate.JsonProperty;
 
-public class HabitacionHotel extends Operadores
+public class HabitacionHotel extends Operador
 {	//Atributos
 	@JsonProperty(value="CodigoSuperIntendencia")
 	protected String CodigoSuperIntendecnia;	

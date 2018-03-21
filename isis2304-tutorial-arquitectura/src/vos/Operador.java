@@ -7,14 +7,14 @@ import java.util.Set;
 import org.codehaus.jackson.annotate.JsonProperty;
 
 
-public class Operadores
+public class Operador
 {	
-	private final static int CAPACIDAD=100;
-	private static int VIVIENDA_U=1;
-	private static int APARTAMENTO=2;
-	private static int HOTEL=3;
-	private static int HOSTAL=4;
-	private static int RESIDENTES_ALEDAÑOS=5;
+	public final static int CAPACIDAD=100;
+	public static int VIVIENDA_U=1;
+	public static int APARTAMENTO=2;
+	public static int HOTEL=3;
+	public static int HOSTAL=4;
+	public static int RESIDENTES_ALEDAÑOS=5;
 
 	//Atributos 
 	@JsonProperty(value="Nombre")
@@ -36,7 +36,7 @@ public class Operadores
 
 
     //Constructor
-	public Operadores(@JsonProperty(value="Nombre")String nombre,@JsonProperty(value="Tipo") int  tipo,@JsonProperty(value="MinDeTiempo") double minTiempo,@JsonProperty(value="Capacidad")double capacidad,@JsonProperty(value="id") Long id)
+	public Operador(@JsonProperty(value="Nombre")String nombre,@JsonProperty(value="Tipo") int  tipo,@JsonProperty(value="MinDeTiempo") double minTiempo,@JsonProperty(value="Capacidad")double capacidad,@JsonProperty(value="id") Long id)
 	{
 		this.Nombre=nombre;
 		this.Tipo=tipo;

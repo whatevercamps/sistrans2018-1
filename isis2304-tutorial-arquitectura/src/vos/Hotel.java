@@ -2,7 +2,7 @@ package vos;
 
 import org.codehaus.jackson.annotate.JsonProperty;
 
-public class HabitacionHotel extends Operador
+public class Hotel extends Operador
 {	//Atributos
 	@JsonProperty(value="CodigoSuperIntendencia")
 	protected String CodigoSuperIntendecnia;	
@@ -13,7 +13,7 @@ public class HabitacionHotel extends Operador
 	@JsonProperty(value="Tamanio")
 	protected String Tamanio;
 
-	public HabitacionHotel(@JsonProperty(value="Nombre")String nombre,
+	public Hotel(@JsonProperty(value="Nombre")String nombre,
 			@JsonProperty(value="Tipo") int tipo,
 			@JsonProperty(value="MinDeTiempo") double minTiempo,
 			@JsonProperty(value="Capacidad")double capacidad

@@ -23,8 +23,11 @@ import com.sun.xml.internal.bind.v2.model.core.ID;
 
 import dao.DAOTablaApartamentos;
 import dao.DAOTablaClientes;
+import dao.DAOTablaHoteles;
+import dao.DAOTablaOperadores;
 import vos.Apartamento;
 import vos.Cliente;
+import vos.Hotel;
 import vos.Operador;
 
 
@@ -205,35 +208,17 @@ public class AlohAndesTM {
 		}
 		return ret;
 	}
+	
 
-	public Apartamento crearOperadorApartamento(Operador operador) {
-		DAOTablaApartamentos dao = new DAOTablaApartamentos();
-		Apartamento ret = null;
+	public boolean existeOperadorPorId(Long id) throws SQLException, Exception{
+		DAOTablaOperadores dao = new DAOTablaOperadores();
+		boolean ret = false;
 		try {
-			
-			//verificar reglas de negocio
-			if (buscarClientePorId(cliente.getCodigo()) != null) {
-				throw new Exception("Ya hay un cliente con ese código");
-			}
-			
 			this.conn = darConexion();
 			dao.setConn(conn);
-			
-			dao.crearCliente(cliente);
-			
-			System.out.println("lo creo");
-			//verificar 
-			
-			ret = buscarClientePorId(cliente.getCodigo());
-			
-			if(ret == null) {
-				throw new Exception("No se guardó correctamente el cliente, revisar xd...");
-			}
+			ret = dao.existeOperadorPorId(id);
 
-			
-
-
-		}  catch (SQLException e) {
+		} catch (SQLException e) {
 			System.err.println("SQLException:" + e.getMessage());
 			e.printStackTrace();
 			throw e;
@@ -255,6 +240,98 @@ public class AlohAndesTM {
 		return ret;
 	}
 
+
+	public void crearOperadorApartamento(Apartamento apartamento)  throws SQLException, Exception{
+		DAOTablaApartamentos dao = new DAOTablaApartamentos();
+		try {
+			
+			//verificar reglas de negocio
+			if (existeOperadorPorId(apartamento.getId())) {
+				throw new Exception("Ya hay un cliente con ese código");
+			}
+			
+			this.conn = darConexion();
+			dao.setConn(conn);
+			
+			dao.crearApartamento(apartamento);
+			
+			System.out.println("lo creo");
+			//verificar 
+			
+			
+			if(!existeOperadorPorId(apartamento.getId())) {
+				throw new Exception("No se guardó correctamente el apartamento, revisar xd...");
+			}
+		}  catch (SQLException e) {
+			System.err.println("SQLException:" + e.getMessage());
+			e.printStackTrace();
+			throw e;
+		} catch (Exception e) {
+			System.err.println("GeneralException:" + e.getMessage());
+			e.printStackTrace();
+			throw e;
+		}finally {
+			try {
+				dao.cerrarRecursos();
+				if(this.conn!=null)
+					this.conn.close();
+			} catch (SQLException exception) {
+				System.err.println("SQLException closing resources:" + exception.getMessage());
+				exception.printStackTrace();
+				throw exception;
+			}
+		}
+
+	}
+
+	public void crearOperadorHotel(Hotel hotel) throws SQLException, Exception{
+		DAOTablaHoteles dao = new DAOTablaHoteles();
+		try {
+			
+			//verificar reglas de negocio
+			if (existeOperadorPorId(hotel.getId())) {
+				throw new Exception("Ya hay un cliente con ese código");
+			}
+			
+			this.conn = darConexion();
+			dao.setConn(conn);
+			
+			dao.crearHotel(hotel);
+			
+			System.out.println("lo creo");
+			//verificar 
+			
+			
+			if(!existeOperadorPorId(hotel.getId())) {
+				throw new Exception("No se guardó correctamente el hotel, revisar xd...");
+			}
+		}  catch (SQLException e) {
+			System.err.println("SQLException:" + e.getMessage());
+			e.printStackTrace();
+			throw e;
+		} catch (Exception e) {
+			System.err.println("GeneralException:" + e.getMessage());
+			e.printStackTrace();
+			throw e;
+		}finally {
+			try {
+				dao.cerrarRecursos();
+				if(this.conn!=null)
+					this.conn.close();
+			} catch (SQLException exception) {
+				System.err.println("SQLException closing resources:" + exception.getMessage());
+				exception.printStackTrace();
+				throw exception;
+			}
+		}
+
+		
+	}
+
+	
+	/**
+	 * 
+	 */
 
 
 }

@@ -43,6 +43,7 @@ public class DAOTablaOperadores {
 	public boolean existeOperadorPorId(Long id) throws SQLException {
 
 		String sqlOperadorPorId = "SELECT * FROM OPERADORES WHERE ID = " + id + " FETCH FIRST 1 ROWS ONLY"; 
+		System.out.println(sqlOperadorPorId);
 		PreparedStatement stOperadorPorId = conn.prepareStatement(sqlOperadorPorId);
 		recursos.add(stOperadorPorId);
 		ResultSet rsOperadorPorId = stOperadorPorId.executeQuery();

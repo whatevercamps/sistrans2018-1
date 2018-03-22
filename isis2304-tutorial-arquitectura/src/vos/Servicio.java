@@ -7,7 +7,7 @@ import org.codehaus.jackson.annotate.JsonProperty;
  * -Jacuzzi,piscina,ect..
  */
 
-public class Servicios_Adicionales
+public class Servicio
 {
 	/**
 	 * Nombre de un servicio adicional
@@ -27,7 +27,7 @@ public class Servicios_Adicionales
 	@JsonProperty(value="id")
 	protected Long id;
 
-	public Servicios_Adicionales(@JsonProperty(value="Nombre")String nombre,@JsonProperty(value="Costo") double costo,@JsonProperty(value="id") Long id) 
+	public Servicio(@JsonProperty(value="Nombre")String nombre,@JsonProperty(value="Costo") double costo,@JsonProperty(value="id") Long id) 
 	{
 		
 		this.Nombre = nombre;

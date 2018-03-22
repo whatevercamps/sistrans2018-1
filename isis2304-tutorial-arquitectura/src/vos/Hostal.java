@@ -2,14 +2,26 @@ package vos;
 import java.util.Date;
 
 import org.codehaus.jackson.annotate.JsonProperty;
-import java.time.LocalDateTime;
+
 public class Hostal extends Operador
 {
 	
 	@JsonProperty(value="HoraApertura")
-	protected LocalDateTime HoraApertura;	
+	protected String HoraApertura;	
 	@JsonProperty(value="HoraClausura")
-	protected LocalDateTime HoraClausura;
+	protected String HoraClausura;
+	@JsonProperty(value="CodIntendencia")
+	protected Long CodIntendencia;
+
+
+	public Long getCodIntendencia() {
+		return CodIntendencia;
+	}
+
+
+	public void setCodIntendencia(Long codIntendencia) {
+		CodIntendencia = codIntendencia;
+	}
 
 
 	public Hostal(@JsonProperty(value="Nombre")String nombre,
@@ -17,32 +29,34 @@ public class Hostal extends Operador
 			@JsonProperty(value="MinDeTiempo") double minTiempo,
 			@JsonProperty(value="Capacidad")double capacidad
 			,@JsonProperty(value="id") Long id,
-			@JsonProperty(value="HoraApertura") LocalDateTime horaA,
-			@JsonProperty(value="HoraClausura") LocalDateTime horaC)
+			@JsonProperty(value="HoraApertura") String horaA,
+			@JsonProperty(value="HoraClausura") String horaC,@JsonProperty(value="CodIntendencia") Long Cod
+)
 	{
-		super(nombre,tipo,minTiempo,capacidad,id);
+		super(nombre,Operador.HOSTAL,minTiempo,capacidad,id);
 		this.HoraApertura=horaA;
 		this.HoraClausura=horaC;
+		this.CodIntendencia=Cod;
 		
 	}
 
 
-	public LocalDateTime getHoraApertura() {
+	public String getHoraApertura() {
 		return HoraApertura;
 	}
 
 
-	public void setHoraApertura(LocalDateTime horaApertura) {
+	public void setHoraApertura(String horaApertura) {
 		HoraApertura = horaApertura;
 	}
 
 
-	public LocalDateTime getHoraClausura() {
+	public String getHoraClausura() {
 		return HoraClausura;
 	}
 
 
-	public void setHoraClausura(LocalDateTime horaClausura) {
+	public void setHoraClausura(String horaClausura) {
 		HoraClausura = horaClausura;
 	}
 

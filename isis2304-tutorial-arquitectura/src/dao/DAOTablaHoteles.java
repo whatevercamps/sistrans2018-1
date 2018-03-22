@@ -41,10 +41,12 @@ public class DAOTablaHoteles {
 
 	public void crearHotel(Hotel hotel) throws SQLException, Exception {
 		
-		String sql = String.format("INSERT INTO OPERADORES(ID, NOMBRE, TIPO) VALUES (%1$s, '%2$s', %3$s)",
-															hotel.getId(),
-															hotel.getNombre(),
-															hotel.getTipo());
+		String sql = String.format("INSERT INTO OPERADORES(ID, NOMBRE, TIPO, MIN_TIEMPO_DIAS, CAPACIDAD) VALUES (%1$s, '%2$s', %3$s, %4$s, %5$s)",
+				hotel.getId(),
+				hotel.getNombre(),
+				hotel.getTipo(),
+				hotel.getMinDeTiempo(),
+				hotel.getCapacidad());
 		
 		System.out.println(sql);
 		PreparedStatement st = conn.prepareStatement(sql);

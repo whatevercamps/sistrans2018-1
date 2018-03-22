@@ -22,7 +22,7 @@ public class Hotel extends Operador
 			,@JsonProperty(value="Capacidad") double capacidadH,
 			@JsonProperty(value="Tamanio") String tamanio)
 	{
-		super(nombre,tipo,minTiempo,capacidad,id);
+		super(nombre,Operador.HOTEL,minTiempo,capacidad,id);
 		this.CodigoSuperIntendecnia=codigo;
 		this.TipoHabitacion=tipoH;
 		this.Capacidad=capacidadH;

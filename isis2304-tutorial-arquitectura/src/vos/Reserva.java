@@ -1,5 +1,5 @@
 package vos;
-import java.util.Date;
+
 
 import org.codehaus.jackson.annotate.JsonProperty;
 /**
@@ -11,18 +11,18 @@ public class Reserva {
 	 * Fecha inicio de la reserva
 	 */
 	@JsonProperty(value="FechaInicial")
-	protected Date FechaInicial;
+	protected String FechaInicial;
 	/**
 	 * Fecha final de reserva
 	 */
 	@JsonProperty(value="FechaFinal")
-	protected Date FechaFinal;
+	protected String FechaFinal;
 	
 	/**
 	 * Ultima fecha pa cancelar reserva antes de penalizacion
 	 */
 	@JsonProperty(value="FcehaConvenienteDeCancelacion")
-	protected Date FechaConvenienteDeCanelacion;
+	protected String FechaConvenienteDeCanelacion;
 	//Asociacion
 	/**
 	 * Representa las propuesta con una reserva
@@ -36,7 +36,7 @@ public class Reserva {
 	protected Long id;
 
 	//Cosntructor 
-	public Reserva(@JsonProperty(value="FechaConvenienteDeCancelacion")Date fechaConvenineteDeCancelacion,@JsonProperty(value="FechaInicial")Date fechaInicial,@JsonProperty(value="FechaFinal")Date fechaFinal,	@JsonProperty(value="id")Long id,@JsonProperty(value="Propuesta")Propuesta propuesta)
+	public Reserva(@JsonProperty(value="FechaConvenienteDeCancelacion")String fechaConvenineteDeCancelacion,@JsonProperty(value="FechaInicial")String fechaInicial,@JsonProperty(value="FechaFinal")String fechaFinal,	@JsonProperty(value="id")Long id,@JsonProperty(value="Propuesta")Propuesta propuesta)
 	{
 		this.FechaConvenienteDeCanelacion=fechaConvenineteDeCancelacion;
 		this.FechaInicial=fechaInicial;
@@ -68,27 +68,27 @@ public class Reserva {
 
 
 
-	public Date getFechaInicial() {
+	public String getFechaInicial() {
 		return FechaInicial;
 	}
 
-	public void setFechaInicial(Date fechaInicial) {
+	public void setFechaInicial(String fechaInicial) {
 		FechaInicial = fechaInicial;
 	}
 
-	public Date getFechaFinal() {
+	public String getFechaFinal() {
 		return FechaFinal;
 	}
 
-	public void setFechaFinal(Date fechaFinal) {
+	public void setFechaFinal(String fechaFinal) {
 		FechaFinal = fechaFinal;
 	}
 
-	public Date getFechaConvenienteDeCanelacion() {
+	public String getFechaConvenienteDeCanelacion() {
 		return FechaConvenienteDeCanelacion;
 	}
 
-	public void setFechaConvenienteDeCanelacion(Date fechaConvenienteDeCanelacion) {
+	public void setFechaConvenienteDeCanelacion(String fechaConvenienteDeCanelacion) {
 		FechaConvenienteDeCanelacion = fechaConvenienteDeCanelacion;
 	}
 

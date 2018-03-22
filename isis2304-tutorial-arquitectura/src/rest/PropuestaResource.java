@@ -18,19 +18,19 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import tm.AlohAndesTM;
-import vos.Cliente;
-import vos.Reserva;
+import vos.Propuesta;
+import vos.Propuesta;
 
 
 
 
 /**
- * Clase que expone servicios REST con ruta base: http://<ip o nombre del host>:8080/RotondAndes/rest/clientes/...
+ * Clase que expone servicios REST con ruta base: http://<ip o nombre del host>:8080/RotondAndes/rest/propuestas/...
  * @author David Bautista
  */
 
-@Path("clientes")
-public class ClienteResorce {
+@Path("propuestas")
+public class PropuestaResource {
 
 	@XmlRootElement
 	public static class RequestBody {
@@ -52,35 +52,19 @@ public class ClienteResorce {
 	@POST
 	@Consumes({ MediaType.APPLICATION_JSON } )
 	@Produces({ MediaType.APPLICATION_JSON } )
-	public Response crearCliente( Cliente cliente) throws SQLException, Exception{
+	public Response crearPropuesta( Propuesta propuesta) throws SQLException, Exception{
 		System.out.println("entreeeeee");
 		AlohAndesTM tm = new AlohAndesTM(getPath());
 		try {
-			Cliente clienteNew = tm.crearCliente(cliente);
-			return Response.status( 200 ).entity( clienteNew ).build();	
-		}catch( Exception e )
-		{
-			return Response.status( 500 ).entity( doErrorMessage( e ) ).build( );
-		}
-	}
-
-
-	@POST
-	@Path("{id: \\d+}/reservas")
-	@Consumes({ MediaType.APPLICATION_JSON } )
-	@Produces({ MediaType.APPLICATION_JSON } )
-	public Response crearReserva(@PathParam("id")Long idCliente, Reserva reserva) throws SQLException, Exception{
-		System.out.println("entreeeeee");
-		AlohAndesTM tm = new AlohAndesTM(getPath());
-		
-		try {
-			tm.crearReserva(idCliente, reserva);
-
+			tm.crearPropuesta(propuesta);
 			return Response.status( 200 ).build();	
 		}catch( Exception e )
 		{
 			return Response.status( 500 ).entity( doErrorMessage( e ) ).build( );
 		}
 	}
+
+
+
 
 }

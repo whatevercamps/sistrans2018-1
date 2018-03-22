@@ -47,7 +47,7 @@ public class Propuesta
 	 * 
 	 */
 	@JsonProperty(value="Servicios")
-	protected List<Servicios_Adicionales> Servicios;
+	protected List<Servicio> Servicios;
 	@JsonProperty(value="reserva")
 	protected Reserva reserva;
 
@@ -110,7 +110,7 @@ public class Propuesta
 	 * 
 	 * @return todos los servicios adicionales asociados a una propuesta
 	 */
-	public List<Servicios_Adicionales> getServicios() {
+	public List<Servicio> getServicios() {
 		if(this.Servicios == null) {
 			this.Servicios = new ArrayList<>();
 		}
@@ -121,15 +121,30 @@ public class Propuesta
 	 * 
 	 * @return el identificador de una propuesta
 	 */
-	public long getId() {
+	public Long getId() {
 		return this.id;
+	}
+	/**
+	 * 
+	 * @return el tipo de una propuesta
+	 */
+	public Integer getTipo() {
+		return this.Tipo;
+	}
+	
+	/**
+	 * 
+	 * @return el nombre de una propuesta
+	 */
+	public String getNombre() {
+		return this.Nombre;
 	}
 	/**
 	 * 
 	 * @param newServicios nueva lista de servicios adicionales a agregar
 	 */
 
-	public void addAllServicios(Set<Servicios_Adicionales> newServicios) {
+	public void addAllServicios(Set<Servicio> newServicios) {
 		if (this.Servicios == null) {
 			this.Servicios = new ArrayList<>();
 		}
@@ -139,7 +154,7 @@ public class Propuesta
 	 * 
 	 * @param newServicios lista de servicios adicionales a elliminar
 	 */
-	public void removeAllServicios(Set<Servicios_Adicionales> newServicios) {
+	public void removeAllServicios(Set<Servicio> newServicios) {
 		if(this.Servicios == null) {
 			return;
 		}
@@ -159,7 +174,7 @@ public class Propuesta
 		myOperador.addPropuestas(this);
 	}
 
-	public void addServicios(Servicios_Adicionales newServicios) {
+	public void addServicios(Servicio newServicios) {
 		if(this.Servicios == null) {
 			this.Servicios = new ArrayList<>();
 		}
@@ -177,7 +192,7 @@ public class Propuesta
 		oldOperador.removePropuestas(this);
 	}
 
-	public void removeServicios(Servicios_Adicionales oldServicios) {
+	public void removeServicios(Servicio oldServicios) {
 		if(this.Servicios == null)
 			return;
 

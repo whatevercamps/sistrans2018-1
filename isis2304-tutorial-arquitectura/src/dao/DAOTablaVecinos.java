@@ -7,16 +7,17 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import vos.Apartamento;
+import vos.Vecino;
+import vos.Vecino;
 
 
-public class DAOTablaApartamentos {
+public class DAOTablaVecinos {
 	
 	private ArrayList<Object> recursos;
 
 	private Connection conn;
 
-	public DAOTablaApartamentos() {
+	public DAOTablaVecinos() {
 		recursos = new ArrayList<Object>();
 	}
 
@@ -39,22 +40,23 @@ public class DAOTablaApartamentos {
 
 
 
-	public void crearApartamento(Apartamento apartamento) throws SQLException, Exception {
+	public void crearVecino(Vecino vecino) throws SQLException, Exception {
 		
 		String sql = String.format("INSERT INTO OPERADORES(ID, NOMBRE, TIPO, MIN_TIEMPO_DIAS, CAPACIDAD) VALUES (%1$s, '%2$s', %3$s, %4$s, %5$s)",
-															apartamento.getId(),
-															apartamento.getNombre(),
-															apartamento.getTipo(),
-															apartamento.getMinDeTiempo(),
-															apartamento.getCapacidad());
+				vecino.getId(),
+				vecino.getNombre(),
+				vecino.getTipo(),
+				vecino.getMinDeTiempo(),
+				vecino.getCapacidad());
 		
 		System.out.println(sql);
 		PreparedStatement st = conn.prepareStatement(sql);
 		st.executeQuery();
 		
-		sql = String.format("INSERT INTO APARTAMENTOS_COMPARTIDOS(ID, TIENE_MUEBLES) VALUES (%1$s, %2$s)",
-														apartamento.getId(),
-														(apartamento.getMuebles()==true?1:0));
+		sql = String.format("INSERT INTO VECINOS(ID,NUM_HABITACIONES,UBICACION,CARACT_SEGURO) VALUES (%1$s, %2$s,'%$3s','%$4s')",
+														vecino.getId(),
+														vecino.getNumeroDeHabitaciones(),
+														vecino.getUbicacion(),vecino.getCaracteristicasDelSeguro());
 
 		System.out.println(sql);
 		st = conn.prepareStatement(sql);

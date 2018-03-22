@@ -43,7 +43,7 @@ public class ViviendaUniversitaria extends Operador
 			@JsonProperty(value="ServicioSalaDeEstudioPrecioAdicional") double precioSalaDeEstudio,
 			@JsonProperty(value="SalaDeEsparcimientoPrecioAdicional")double precioEsparcimiento)
 	{
-		super(nombre,tipo,minTiempo,capacidad,id);
+		super(nombre,Operador.VIVIENDA_U,minTiempo,capacidad,id);
 		this.ServicioSalaDeEstudioPrecioAdicional=precioSalaDeEstudio;
 		this.ServicioGymPrecioAdicional=precioGym;
 		this.RestaurantePrecioAdicional=precioRestaurante;

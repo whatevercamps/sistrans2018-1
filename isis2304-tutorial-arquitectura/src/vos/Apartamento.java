@@ -8,27 +8,27 @@ public class Apartamento extends Operador
 	/**
 	 * Indica si el apratamento se encuentra amoblado
 	 */
-	@JsonProperty(value="Muebles")
-	protected Boolean Muebles;
+	@JsonProperty(value="muebles")
+	protected Boolean muebles;
 
-	public Apartamento(@JsonProperty(value="Nombre")String nombre,
-			@JsonProperty(value="Tipo") Integer tipo,
-			@JsonProperty(value="MinDeTiempo") Double minTiempo,
-			@JsonProperty(value="Capacidad")Double capacidad,
+	public Apartamento(@JsonProperty(value="nombre")String nombre,
+			@JsonProperty(value="tipo") Integer tipo,
+			@JsonProperty(value="minDeTiempo") Double minTiempo,
+			@JsonProperty(value="capacidad")Double capacidad,
 			@JsonProperty(value="id") Long id,
-			@JsonProperty(value="Muebles")Boolean muebles)
+			@JsonProperty(value="muebles")Boolean muebles)
 	{
-	super(nombre, tipo, minTiempo, capacidad, id);
-	this.Muebles=muebles;
+	super(nombre, Operador.APARTAMENTO, minTiempo, capacidad, id);
+	this.muebles=muebles;
 	
 	}
 
 	public Boolean getMuebles() {
-		return Muebles;
+		return muebles;
 	}
 
 	public void setMuebles(Boolean muebles) {
-		Muebles = muebles;
+		muebles = muebles;
 	}
 	
 

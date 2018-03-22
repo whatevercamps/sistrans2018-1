@@ -17,11 +17,16 @@ import javax.ws.rs.core.Response;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import com.sun.xml.internal.ws.api.message.Message;
+
 import tm.AlohAndesTM;
 import vos.Apartamento;
 import vos.Cliente;
+import vos.Hostal;
 import vos.Hotel;
 import vos.Operador;
+import vos.Vecino;
+import vos.ViviendaUniversitaria;
 
 
 
@@ -55,15 +60,13 @@ public class OperadorResource {
 
 		try {
 			tm.crearOperadorApartamento(apartamento);
-			return Response.status( 200 ).entity( "se creó correctamente el apartamento ").build();	
+			return Response.status( 200 ).build();	
 		}catch( Exception e )
 		{
 			return Response.status( 500 ).entity( doErrorMessage( e ) ).build( );
 		}
-
-
 	}
-	
+
 	@POST
 	@Path("/hoteles")
 	@Consumes({ MediaType.APPLICATION_JSON } )
@@ -73,16 +76,58 @@ public class OperadorResource {
 
 		try {
 			tm.crearOperadorHotel(hotel);
-			return Response.status( 200 ).entity( "se creó correctamente el hotel ").build();	
+			return Response.status( 200 ).build();	
 		}catch( Exception e )
 		{
 			return Response.status( 500 ).entity( doErrorMessage( e ) ).build( );
 		}
-
-
 	}
+	
+	@POST
+	@Path("/hostales")
+	@Consumes({ MediaType.APPLICATION_JSON } )
+	@Produces({ MediaType.APPLICATION_JSON } )
+	public Response crearApartamento(Hostal hostal) throws SQLException, Exception{
+		AlohAndesTM tm = new AlohAndesTM(getPath());
 
+		try {
+			tm.crearOperadorHostal(hostal);
+			return Response.status( 200 ).build();	
+		}catch( Exception e )
+		{
+			return Response.status( 500 ).entity( doErrorMessage( e ) ).build( );
+		}
+	}
+	
+	@POST
+	@Path("/vecinos")
+	@Consumes({ MediaType.APPLICATION_JSON } )
+	@Produces({ MediaType.APPLICATION_JSON } )
+	public Response crearVecino(Vecino vecino) throws SQLException, Exception{
+		AlohAndesTM tm = new AlohAndesTM(getPath());
 
+		try {
+			tm.crearOperadorVecino(vecino);
+			return Response.status( 200 ).build();	
+		}catch( Exception e )
+		{
+			return Response.status( 500 ).entity( doErrorMessage( e ) ).build( );
+		}
+	}
+	
+	@POST
+	@Path("/ViviendasUniversitarias")
+	@Consumes({ MediaType.APPLICATION_JSON } )
+	@Produces({ MediaType.APPLICATION_JSON } )
+	public Response crearViviendaUniversitaria(ViviendaUniversitaria viviendaUniversitaria) throws SQLException, Exception{
+		AlohAndesTM tm = new AlohAndesTM(getPath());
 
-
+		try {
+			tm.crearOperadorViviendaUniversitaria(viviendaUniversitaria);
+			return Response.status( 200 ).build();	
+		}catch( Exception e )
+		{
+			return Response.status( 500 ).entity( doErrorMessage( e ) ).build( );
+		}
+	}
 }

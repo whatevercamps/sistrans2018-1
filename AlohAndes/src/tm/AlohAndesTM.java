@@ -621,16 +621,16 @@ public class AlohAndesTM {
 
 	public void crearReserva(Long idCliente, Reserva reserva)  throws SQLException, Exception{
 		DAOTablaReservas dao = new DAOTablaReservas();
+		
+		//reglas de negocio
+		
+		if(existeReservaPropuestaCliente(idCliente, reserva.getPropuesta().getId())) {
+			throw new Exception("Ya existe una reserva de esta propuesta para este cliente");
+		}
+		
 		try {
 			this.conn = darConexion();
 			dao.setConn(conn);
-			
-			//reglas de negocio
-			
-			if(existeReservaPropuestaCliente(idCliente, reserva.getPropuesta().getId())) {
-				throw new Exception("Ya existe una reserva de esta propuesta para este cliente");
-			}
-			
 			
 			dao.crearReserva(idCliente, reserva);
 

@@ -5,6 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -63,12 +64,14 @@ public class DAOTablaReservas {
 
 
 	public void crearReserva(Long idCliente, Reserva reserva) throws SQLException, Exception {
-		String sql = String.format("INSERT INTO RESERVAS(ID, ID_CLIENTE, ID_PROPUESTA, FECHA_INIC, FECHA_FINI) VALUES (%1$s, %2$s, %3$s, TO_DATE('%4$s', 'yyyy-mm-dd'), TO_DATE( '%4$s', 'yyyy-mm-dd'))",
+		
+		SimpleDateFormat dtf = new SimpleDateFormat("yyyy-MM-dd");
+		String sql = String.format("INSERT INTO RESERVAS(ID, ID_CLIENTE, ID_PROPUESTA, FECHA_INIC, FECHA_FINA) VALUES (%1$s, %2$s, %3$s, TO_DATE('%4$s', 'yyyy-mm-dd'), TO_DATE( '%4$s', 'yyyy-mm-dd'))",
 				reserva.getId(),
 				idCliente, 
 				reserva.getPropuesta().getId(),
-				reserva.getFechaInicial().toString(),
-				reserva.getFechaFinal()).toString();
+				dtf.format(reserva.getFechaInicial()),
+				dtf.format(reserva.getFechaFinal()));
 System.out.println(sql);
 PreparedStatement st = conn.prepareStatement(sql);
 recursos.add(st);

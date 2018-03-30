@@ -1,4 +1,6 @@
 package vos;
+import java.util.List;
+
 import javax.*;
 
 import org.codehaus.jackson.annotate.JsonProperty;
@@ -41,14 +43,18 @@ public class Cliente {
 	@JsonProperty(value="tipo")
 	protected Integer tipo;
 	/**
-	 * Relacion que permite a un cliente acceder a una propuesta
+	 * Relacion que permite a un cliente acceder a la lista de sus reservas actuales y antiguas
 	 */
-	@JsonProperty(value="contrato")
-	protected Reserva contrato;
+	@JsonProperty(value="historia")
+	protected List<Factura> historia;
 
 	///Metodo constructor 
 
-	public Cliente(@JsonProperty(value="codigo")Long codigo,@JsonProperty(value="nombre")String nombre,@JsonProperty(value="Appellido")String apellido,@JsonProperty(value="tipo")Integer tipo,@JsonProperty(value="contrato") Reserva reserva)
+	public Cliente(@JsonProperty(value="codigo")Long codigo,
+			@JsonProperty(value="nombre")String nombre,
+			@JsonProperty(value="Appellido")String apellido,
+			@JsonProperty(value="tipo")Integer tipo,
+			@JsonProperty(value="historia") List<Factura> historia)
 	{
 		this.codigo=codigo;
 		this.nombre=nombre;
@@ -58,9 +64,9 @@ public class Cliente {
 		{
 			this.tipo=tipo;
 		}
-		if(contrato!=null)
+		if(historia!=null)
 		{	
-			this.contrato=reserva;
+			this.historia=historia;
 		}
 	}
 	//Metodos getter y setter
@@ -97,8 +103,8 @@ public class Cliente {
 	 * 
 	 * @return contrato de un cliente
 	 */
-	public Reserva getContrato() {
-		return this.contrato;
+	public List<Factura> getHistoris() {
+		return this.historia;
 	}
 	
 	/**
@@ -108,6 +114,7 @@ public class Cliente {
 	public void setCodigo(Long myCodigo) {
 		this.codigo = myCodigo;
 	}
+	
 	/**
 	 * 
 	 * @param myNombre del cliente
@@ -115,6 +122,7 @@ public class Cliente {
 	public void setNombre(String myNombre) {
 		this.nombre = myNombre;
 	}
+	
 	/**
 	 * 
 	 * @param myApellido apellido del cliente
@@ -135,8 +143,8 @@ public class Cliente {
 	 * 
 	 * @param myContrato contrato nuevo 
 	 */
-	public void setContrato(Reserva myContrato) {
-		this.contrato = myContrato;
+	public void setContrato(List<Factura> myContrato) {
+		this.historia = myContrato;
 	}
 
 

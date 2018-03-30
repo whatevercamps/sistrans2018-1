@@ -6,6 +6,7 @@ import java.util.List;
 
 import javax.servlet.ServletContext;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -35,8 +36,8 @@ import vos.Reserva;
 public class ClienteResorce {
 
 	@XmlRootElement
-	public static class RequestBody {
-		@XmlElement Long[][] idsPedidos;
+	public static class DatosPago {
+		@XmlElement Double CantPago;
 	}
 
 
@@ -54,7 +55,7 @@ public class ClienteResorce {
 	@POST
 	@Consumes({ MediaType.APPLICATION_JSON } )
 	@Produces({ MediaType.APPLICATION_JSON } )
-	public Response crearCliente( Cliente cliente) throws SQLException, Exception{
+	public Response crearCliente(Cliente cliente) throws SQLException, Exception{
 		System.out.println("entreeeeee");
 		AlohAndesTM tm = new AlohAndesTM(getPath());
 		try {
@@ -99,6 +100,23 @@ public class ClienteResorce {
 		{
 			return Response.status( 500 ).entity( doErrorMessage( e ) ).build( );
 		}
+	}
+	
+	@DELETE
+	@Path("{id: \\d+}/reservas/{idReserva: \\d+}")
+	@Consumes({ MediaType.APPLICATION_JSON } )
+	@Produces({ MediaType.APPLICATION_JSON } )
+	public Response terminarReserva(@PathParam("id")Long idCliente, @PathParam("idReserva")Long idReserva, DatosPago datos) throws SQLException, Exception{
+		AlohAndesTM tm = new AlohAndesTM(getPath());
+		try {
+			tm.terminarReserva(idCliente, idReserva, datos.CantPago);
+
+			return Response.status( 200 ).build();	
+		}catch( Exception e )
+		{
+			return Response.status( 500 ).entity( doErrorMessage( e ) ).build( );
+		}
+		
 	}
 
 }

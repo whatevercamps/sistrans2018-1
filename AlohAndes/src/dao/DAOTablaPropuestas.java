@@ -44,7 +44,7 @@ public class DAOTablaPropuestas {
 
 		ArrayList<Propuesta> propuestas = new ArrayList<Propuesta>();
 		String sql = "SELECT * FROM PROPUESTAS, RESERVAS WHERE PROPUESTAS.ID = ID_PROPUESTA";
-	
+
 		switch(filtro) {
 
 		case RESERVA:
@@ -104,6 +104,22 @@ public class DAOTablaPropuestas {
 		PreparedStatement st = conn.prepareStatement(sql);
 		recursos.add(st);
 		st.executeQuery();
+	}
+
+
+	public Object[] saberDiasCancelacionEInicial(Long idReserva)  throws SQLException, Exception {
+		String sql = "SELECT DIAS_CANCELACION, FECHA_INIC FROM PROPUESTA PR, RESERVA RE WHERE RE.ID_PROPUESTA = PR.ID" + 
+				" AND RE.ID = " + idReserva;
+
+		PreparedStatement st = conn.prepareStatement("select count(*) cont from facturas");
+		recursos.add(st);
+		System.out.println(sql);
+		ResultSet rs = st.executeQuery();
+		rs.next();
+		Object[] ret = new Object[2];
+		ret[0] = rs.getInt("DIAS_CANCELACION");
+		ret[1] = rs.getDate("FECHA_INIC");
+		return ret;
 	}
 
 }

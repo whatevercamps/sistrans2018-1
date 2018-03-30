@@ -11,6 +11,7 @@ import java.util.List;
 
 import javax.swing.text.DateFormatter;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -21,8 +22,10 @@ import vos.Reserva;
 
 
 public class DAOTablaReservas {
-	
+
 	public static final int BUSQUEDA_CLIENTE = 1;
+	public static final int BUSQUEDA_ID = 2;
+	public static final int BUSQUEDA_CLIENTE_ID_RESERVA_ID = 3;
 	private ArrayList<Object> recursos;
 
 	private Connection conn;
@@ -47,8 +50,12 @@ public class DAOTablaReservas {
 		this.conn = conn;
 	}
 
-	public boolean existeReservaPropuestaCliente(Long idCliente, Long idProp) throws SQLException, Exception{
-		String sqlReserva = "SELECT * FROM RESERVAS WHERE ID_CLIENTE = " + idCliente + " AND ID_PROPUESTA = " + idProp + " FETCH FIRST 1 ROWS ONLY"; 
+	public boolean existeReservaPropuestaCliente(Long idCliente, Long idProp, Date fechaInic, Date fechaFinal) throws SQLException, Exception{
+		SimpleDateFormat dtf = new SimpleDateFormat("yyyy-MM-dd");
+		String sqlReserva = String.format("SELECT RE.* FROM RESERVAS RE, FACTURAS FA WHERE RE.ID_FACTURA = FA.ID AND "
+				+ "ID_CLIENTE = " + idCliente + " AND ID_PROPUESTA = " + idProp 
+				+ " AND FECHA_FINA >= TO_DATE('%1$s', 'yyyy-mm-dd') "
+				+ " AND FECHA_INIC <= TO_DATE('%2$s', 'yyyy-mm-dd') FETCH FIRST 1 ROWS ONLY", dtf.format(fechaInic), dtf.format(fechaFinal)); 
 		System.out.println(sqlReserva);
 		PreparedStatement st = conn.prepareStatement(sqlReserva);
 		recursos.add(st);
@@ -63,34 +70,41 @@ public class DAOTablaReservas {
 	}
 
 
-	public void crearReserva(Long idCliente, Reserva reserva) throws SQLException, Exception {
-		
+	public void crearReserva(Long idFactura, Reserva reserva) throws SQLException, Exception {
+
 		SimpleDateFormat dtf = new SimpleDateFormat("yyyy-MM-dd");
-		String sql = String.format("INSERT INTO RESERVAS(ID, ID_CLIENTE, ID_PROPUESTA, FECHA_INIC, FECHA_FINA) VALUES (%1$s, %2$s, %3$s, TO_DATE('%4$s', 'yyyy-mm-dd'), TO_DATE( '%4$s', 'yyyy-mm-dd'))",
+		String sql = String.format("INSERT INTO RESERVAS(ID, ID_FACTURA, ID_PROPUESTA, FECHA_INIC, FECHA_FINA) VALUES (%1$s, %2$s, %3$s, TO_DATE('%4$s', 'yyyy-mm-dd'), TO_DATE( '%4$s', 'yyyy-mm-dd'))",
 				reserva.getId(),
-				idCliente, 
+				idFactura, 
 				reserva.getPropuesta().getId(),
 				dtf.format(reserva.getFechaInicial()),
 				dtf.format(reserva.getFechaFinal()));
-System.out.println(sql);
-PreparedStatement st = conn.prepareStatement(sql);
-recursos.add(st);
-st.executeQuery();
-		
+		System.out.println(sql);
+		PreparedStatement st = conn.prepareStatement(sql);
+		recursos.add(st);
+		st.executeQuery();
+
 	}
 
 
 	public List<Reserva> darReservasPor(int filtro, String parametro) throws SQLException, Exception{
 		List<Reserva> reservas = new ArrayList<Reserva>();
-		String sql = "SELECT * FROM RESERVAS";
-		
+		String sql = "SELECT RE.* FROM RESERVAS RE, FACTURAS FA WHERE RE.ID_FACTURA = FA.ID";
+
 		switch(filtro) {
 
 		case BUSQUEDA_CLIENTE:
-			sql += String.format(" WHERE ID_CLIENTE = %1$s", parametro);
+			sql += String.format(" AND ID_CLIENTE = %1$s", parametro);
+			break;
+		
+		case BUSQUEDA_ID:
+			sql += String.format(" AND RE.ID = %1$s", parametro);
 			break;
 
-
+		case BUSQUEDA_CLIENTE_ID_RESERVA_ID:
+			String[] datos = parametro.split(",");
+			sql += String.format(" AND ID_CLIENTE = %1$s", datos[0]);
+			sql += String.format(" AND RE.ID = %1$s", datos[1]);
 		default:
 			break;
 		}
@@ -99,7 +113,7 @@ st.executeQuery();
 		PreparedStatement st = conn.prepareStatement(sql);
 		recursos.add(st);
 		ResultSet rs = st.executeQuery();
-		
+
 		while(rs.next()) {
 			System.out.println("si hay " + rs.getLong("ID"));
 			Reserva act = new Reserva();
@@ -107,7 +121,7 @@ st.executeQuery();
 			act.setFechaInicial(rs.getDate("FECHA_INIC"));
 			act.setFechaFinal(rs.getDate("FECHA_FINA"));
 			reservas.add(act);
-			
+
 		}
 		return reservas;
 	}

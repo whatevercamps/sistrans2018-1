@@ -16,6 +16,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Properties;
@@ -24,6 +25,7 @@ import com.sun.xml.internal.bind.v2.model.core.ID;
 
 import dao.DAOTablaApartamentos;
 import dao.DAOTablaClientes;
+import dao.DAOTablaFacturas;
 import dao.DAOTablaHostales;
 import dao.DAOTablaHoteles;
 import dao.DAOTablaOperadores;
@@ -559,12 +561,12 @@ public class AlohAndesTM {
 		DAOTablaServicios dao = new DAOTablaServicios();
 
 		try {
-				for(Servicio ser : servicios) {
-					if(!existeServicioPorId(ser.getId())) {
-						throw new Exception("No existe el servicio con el id");
-					}
-					
-					dao.conectarServicioAPropuesta(ser.getId(), propuesta.getId());
+			for(Servicio ser : servicios) {
+				if(!existeServicioPorId(ser.getId())) {
+					throw new Exception("No existe el servicio con el id");
+				}
+
+				dao.conectarServicioAPropuesta(ser.getId(), propuesta.getId());
 			}
 
 		}  catch (SQLException e) {
@@ -620,19 +622,23 @@ public class AlohAndesTM {
 	}
 
 	public void crearReserva(Long idCliente, Reserva reserva)  throws SQLException, Exception{
-		DAOTablaReservas dao = new DAOTablaReservas();
-		
-		//reglas de negocio
-		
-		if(existeReservaPropuestaCliente(idCliente, reserva.getPropuesta().getId())) {
+
+
+		if(existeReservaEnConflicto(idCliente, reserva.getPropuesta().getId(), reserva.getFechaInicial(), reserva.getFechaFinal())) {
 			throw new Exception("Ya existe una reserva de esta propuesta para este cliente");
 		}
-		
+
+		Long idFactura = crearFactura(idCliente);
+
+		DAOTablaReservas dao = new DAOTablaReservas();
+
+		//reglas de negocio
+
 		try {
 			this.conn = darConexion();
 			dao.setConn(conn);
-			
-			dao.crearReserva(idCliente, reserva);
+			dao.crearReserva(idFactura, reserva);
+
 
 		} catch (SQLException e) {
 			System.err.println("SQLException:" + e.getMessage());
@@ -655,13 +661,44 @@ public class AlohAndesTM {
 		}
 	}
 
-	public boolean existeReservaPropuestaCliente(Long idCliente, Long idProp) throws SQLException, Exception {
+	public Long crearFactura(Long idCliente) throws SQLException, Exception{
+		Long index = null;
+		DAOTablaFacturas dao = new DAOTablaFacturas();
+		try {
+			this.conn = darConexion();
+			dao.setConn(conn);
+			index = dao.crearFactura(idCliente);
+
+		} catch (SQLException e) {
+			System.err.println("SQLException:" + e.getMessage());
+			e.printStackTrace();
+			throw e;
+		} catch (Exception e) {
+			System.err.println("GeneralException:" + e.getMessage());
+			e.printStackTrace();
+			throw e;
+		}finally {
+			try {
+				dao.cerrarRecursos();
+				if(this.conn!=null)
+					this.conn.close();
+			} catch (SQLException exception) {
+				System.err.println("SQLException closing resources:" + exception.getMessage());
+				exception.printStackTrace();
+				throw exception;
+			}
+		}
+		return index;
+
+	}
+
+	public boolean existeReservaEnConflicto(Long idCliente, Long idProp, Date fechaIn, Date fechaFi) throws SQLException, Exception {
 		DAOTablaReservas dao = new DAOTablaReservas();
 		boolean ret = false;
 		try {
 			this.conn = darConexion();
 			dao.setConn(conn);
-			ret = dao.existeReservaPropuestaCliente(idCliente, idProp);
+			ret = dao.existeReservaPropuestaCliente(idCliente, idProp, fechaIn, fechaFi);
 
 		} catch (SQLException e) {
 			System.err.println("SQLException:" + e.getMessage());
@@ -688,11 +725,11 @@ public class AlohAndesTM {
 	public List<Reserva> darReservasPor(int filtro, String parametro) throws SQLException, Exception{
 		DAOTablaReservas dao = new DAOTablaReservas();
 		List<Reserva> reservas = new ArrayList<Reserva>();
-		
+
 		if(filtro == DAOTablaReservas.BUSQUEDA_CLIENTE && buscarClientePorId(Long.parseLong(parametro)) == null) {
 			throw new Exception("El cliente no existe");
 		}
-		
+
 		try {
 			this.conn = darConexion();
 			dao.setConn(conn);
@@ -722,7 +759,7 @@ public class AlohAndesTM {
 				throw exception;
 			}
 		}
-		
+
 		return reservas;
 	}
 
@@ -770,7 +807,7 @@ public class AlohAndesTM {
 			this.conn = darConexion();
 			dao.setConn(conn);
 			servicios = dao.darServiciosPor(filtro, parametro);
-			
+
 		}catch (SQLException e) {
 			System.err.println("SQLException:" + e.getMessage());
 			e.printStackTrace();
@@ -792,10 +829,121 @@ public class AlohAndesTM {
 			}
 		}
 		return servicios; 
-		
+
 	}
 
-	
+	public void terminarReserva(Long idCliente, Long idReserva, Double cantPago) throws SQLException, Exception{
+		if( darReservasPor(DAOTablaReservas.BUSQUEDA_CLIENTE_ID_RESERVA_ID,  idCliente + "," + idReserva).isEmpty()) {
+			throw new Exception("El cliente no tiene una reserva con dicho id");
+		}
+		actualizarCostoTotal(idReserva);
+		boolean fin = cancelarFactura(idReserva, cantPago);
+		if (fin) 
+			eliminarReserva();
+		else {
+			throw new Exception("El dinero no es suficiente, se abonó pero no se terminó la reserva.");
+		}
+	}
+
+	private void actualizarCostoTotal(Long idReserva) throws SQLException, Exception{
+		DAOTablaFacturas dao = new DAOTablaFacturas();
+		Object[] dias = saberDiasYFechaInicial(idReserva);
+		try {
+			this.conn = darConexion();
+			dao.setConn(conn);
+			dao.actualizarPago(idReserva);
+
+
+		}catch (SQLException e) {
+			System.err.println("SQLException:" + e.getMessage());
+			e.printStackTrace();
+			throw e;
+		} catch (Exception e) {
+			System.err.println("GeneralException:" + e.getMessage());
+			e.printStackTrace();
+			throw e;
+		} finally {
+			try {
+				dao.cerrarRecursos();
+				if(this.conn!=null)
+					this.conn.close();
+			} catch (SQLException exception) {
+				System.err.println("SQLException closing resources:" + exception.getMessage());
+				exception.printStackTrace();
+				throw exception;
+			}
+		}
+
+	}
+
+
+
+	private Object[] saberDiasYFechaInicial(Long idReserva) throws SQLException, Exception{
+		DAOTablaPropuestas dao = new DAOTablaPropuestas();
+		Object[] dias = new Object[2];
+		try {
+			this.conn = darConexion();
+			dao.setConn(conn);
+			dias = dao.saberDiasCancelacionEInicial(idReserva);
+			
+
+		}catch (SQLException e) {
+			System.err.println("SQLException:" + e.getMessage());
+			e.printStackTrace();
+			throw e;
+		} catch (Exception e) {
+			System.err.println("GeneralException:" + e.getMessage());
+			e.printStackTrace();
+			throw e;
+		} finally {
+			try {
+
+				dao.cerrarRecursos();
+				if(this.conn!=null)
+					this.conn.close();
+			} catch (SQLException exception) {
+				System.err.println("SQLException closing resources:" + exception.getMessage());
+				exception.printStackTrace();
+				throw exception;
+			}
+		}
+		return dias;
+	}
+
+	private boolean cancelarFactura(Long idReserva, Double cantPago) throws SQLException, Exception{
+		DAOTablaFacturas dao = new DAOTablaFacturas();
+		boolean ret = false;
+		try {
+			this.conn = darConexion();
+			dao.setConn(conn);
+			Double restante = dao.abonarFactura(idReserva, cantPago);
+			if(restante <= 0)
+				ret = true;
+
+		}catch (SQLException e) {
+			System.err.println("SQLException:" + e.getMessage());
+			e.printStackTrace();
+			throw e;
+		} catch (Exception e) {
+			System.err.println("GeneralException:" + e.getMessage());
+			e.printStackTrace();
+			throw e;
+		} finally {
+			try {
+
+				dao.cerrarRecursos();
+				if(this.conn!=null)
+					this.conn.close();
+			} catch (SQLException exception) {
+				System.err.println("SQLException closing resources:" + exception.getMessage());
+				exception.printStackTrace();
+				throw exception;
+			}
+		}
+		return ret;
+	}
+
+
 
 
 }

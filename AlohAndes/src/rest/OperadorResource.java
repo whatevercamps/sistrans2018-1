@@ -6,6 +6,7 @@ import java.util.List;
 
 import javax.servlet.ServletContext;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -133,7 +134,7 @@ public class OperadorResource {
 	}
 	
 	@POST
-	@Path("{id: \\d+}/ViviendasUniversitarias")
+	@Path("/{id: \\d+}")
 	@Consumes({ MediaType.APPLICATION_JSON } )
 	@Produces({ MediaType.APPLICATION_JSON } )
 	public Response crearPropuesta(@PathParam("id") Long idOperador, Propuesta propuesta ) throws SQLException, Exception{
@@ -141,6 +142,21 @@ public class OperadorResource {
 		AlohAndesTM tm = new AlohAndesTM(getPath());
 		try {
 			tm.crearPropuesta(idOperador, propuesta);
+			return Response.status( 200 ).build();	
+		}catch( Exception e )
+		{
+			return Response.status( 500 ).entity( doErrorMessage( e ) ).build( );
+		}
+	}
+	
+	@DELETE
+	@Path("/{id: \\d+}/propuestas/{idPropuesta: \\d+}")
+	@Produces({ MediaType.APPLICATION_JSON } )
+	public Response retirarPropuesta(@PathParam("id") Long idOperador, @PathParam("idPropuesta") Long idPropuesta) throws SQLException, Exception{
+		System.out.println("entreeeeee");
+		AlohAndesTM tm = new AlohAndesTM(getPath());
+		try {
+			tm.retirarPropuesta(idOperador, idPropuesta);
 			return Response.status( 200 ).build();	
 		}catch( Exception e )
 		{

@@ -22,10 +22,11 @@ import vos.Reserva;
 
 
 public class DAOTablaReservas {
-
+	public static final int BUSQUEDA_PROPUESTA = 0;
 	public static final int BUSQUEDA_CLIENTE = 1;
 	public static final int BUSQUEDA_ID = 2;
 	public static final int BUSQUEDA_CLIENTE_ID_RESERVA_ID = 3;
+
 	private ArrayList<Object> recursos;
 
 	private Connection conn;
@@ -105,13 +106,18 @@ public class DAOTablaReservas {
 			String[] datos = parametro.split(",");
 			sql += String.format(" AND ID_CLIENTE = %1$s", datos[0]);
 			sql += String.format(" AND RE.ID = %1$s", datos[1]);
+			
+		case BUSQUEDA_PROPUESTA:
+			sql += " AND ID_PROPUESTA = " + parametro;
 		default:
 			break;
 		}
 
-		System.out.println(sql);
+
 		PreparedStatement st = conn.prepareStatement(sql);
 		recursos.add(st);
+		System.out.println("Filtro: " + filtro + ", paramatro: " + parametro);
+		System.out.println(sql);
 		ResultSet rs = st.executeQuery();
 
 		while(rs.next()) {
@@ -124,6 +130,15 @@ public class DAOTablaReservas {
 
 		}
 		return reservas;
+	}
+
+
+	public void eliminarReserva(Long id)  throws SQLException, Exception{
+		String sql = "DELETE FROM RESERVAS WHERE ID = " + id;
+		PreparedStatement st = conn.prepareStatement(sql);
+		recursos.add(st);
+		System.out.println(sql);
+		st.executeQuery();
 	}
 
 }

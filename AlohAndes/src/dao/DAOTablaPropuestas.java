@@ -6,6 +6,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import vos.Cliente;
 import vos.Propuesta;
@@ -14,8 +15,7 @@ import vos.Propuesta;
 public class DAOTablaPropuestas {
 
 	public static final int RESERVA = 1;
-
-	public final static String USUARIO = "PARRANDEROS";
+	public static final int ID_IDOPERADOR = 2;
 	private ArrayList<Object> recursos;
 
 	private Connection conn;
@@ -43,15 +43,17 @@ public class DAOTablaPropuestas {
 	public List<Propuesta> darPropuestasPor(Integer filtro, String parametro) throws SQLException, Exception{
 
 		ArrayList<Propuesta> propuestas = new ArrayList<Propuesta>();
-		String sql = "SELECT * FROM PROPUESTAS, RESERVAS WHERE PROPUESTAS.ID = ID_PROPUESTA";
+		String sql = "SELECT * FROM PROPUESTAS LEFT OUTER JOIN RESERVAS ON PROPUESTAS.ID = ID_PROPUESTA";
 
 		switch(filtro) {
 
 		case RESERVA:
-			sql +=  " AND RESERVAS.ID = " + Integer.parseInt(parametro);
+			sql +=  " WHERE RESERVAS.ID = " + Integer.parseInt(parametro);
 			break;
 
-
+		case ID_IDOPERADOR:
+			String[] datos = parametro.split(",");  
+			sql += " WHERE ID_OPERADOR = " + datos[1] + " AND PROPUESTAS.ID = " + datos[0];
 		default:
 			break;
 		}
@@ -107,19 +109,33 @@ public class DAOTablaPropuestas {
 	}
 
 
-	public Object[] saberDiasCancelacionEInicial(Long idReserva)  throws SQLException, Exception {
-		String sql = "SELECT DIAS_CANCELACION, FECHA_INIC FROM PROPUESTA PR, RESERVA RE WHERE RE.ID_PROPUESTA = PR.ID" + 
-				" AND RE.ID = " + idReserva;
+	public Long[] saberDiasCancelacionYFechasMillis(Long idReserva)  throws SQLException, Exception {
+		String sql = "SELECT DIAS_CANCELACION, FECHA_INIC, FECHA_FINA, FECHA_CREACION FROM PROPUESTAS PR, RESERVAS RE, FACTURAS FA WHERE RE.ID_PROPUESTA = PR.ID" + 
+				" AND FA.ID = RE.ID_FACTURA AND RE.ID = " + idReserva;
 
-		PreparedStatement st = conn.prepareStatement("select count(*) cont from facturas");
+		PreparedStatement st = conn.prepareStatement(sql);
 		recursos.add(st);
 		System.out.println(sql);
 		ResultSet rs = st.executeQuery();
 		rs.next();
-		Object[] ret = new Object[2];
-		ret[0] = rs.getInt("DIAS_CANCELACION");
-		ret[1] = rs.getDate("FECHA_INIC");
+		Long[] ret = new Long[4];
+		
+		ret[1] = rs.getDate("FECHA_CREACION").getTime();
+		ret[2] = rs.getDate("FECHA_INIC").getTime();
+		ret[3] = rs.getDate("FECHA_FINA").getTime();
+		ret[0] = ret[1] + TimeUnit.DAYS.toMillis(rs.getInt("DIAS_CANCELACION"));
+		
 		return ret;
+	}
+
+
+	public void retirarPropuesta(Long idPropuesta) throws SQLException, Exception  {
+		String sql = "DELETE FROM PROPUESTAS WHERE ID = " + idPropuesta;
+		PreparedStatement st = conn.prepareStatement(sql);
+		recursos.add(st);
+		System.out.println(sql);
+		st.executeQuery();
+		
 	}
 
 }

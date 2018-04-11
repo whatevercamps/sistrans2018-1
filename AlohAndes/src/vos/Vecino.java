@@ -38,7 +38,7 @@ public class Vecino extends Operador
 			@JsonProperty(value="ubicacion") String posi,
 			@JsonProperty(value="minimoTiempo") Integer minimoTiempo)
 	{
-		super(nombre,Operador.RESIDENTES_ALEDAÑOS, capacidad, id, minimoTiempo);
+		super(nombre,Operador.RESIDENTES_ALEDANIOS, capacidad, id, minimoTiempo);
 		this.caracteristicasDelSeguro=seguro;
 		this.numeroDeHabitaciones=valor;
 		this.ubicacion=posi;

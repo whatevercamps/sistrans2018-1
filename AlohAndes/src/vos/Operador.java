@@ -14,7 +14,7 @@ public class Operador
 	public static int APARTAMENTO=2;
 	public static int HOTEL=3;
 	public static int HOSTAL=4;
-	public static int RESIDENTES_ALEDAÑOS=5;
+	public static int RESIDENTES_ALEDANIOS=5;
 
 	//Atributos 
 	@JsonProperty(value="nombre")
@@ -48,7 +48,7 @@ public class Operador
 		this.id=id;
 		this.propuestas= new ArrayList<>();
 		if(tipo==CAPACIDAD||tipo==VIVIENDA_U||tipo==APARTAMENTO
-				   ||tipo==HOSTAL||tipo==HOTEL||tipo==RESIDENTES_ALEDAÑOS)
+				   ||tipo==HOSTAL||tipo==HOTEL||tipo==RESIDENTES_ALEDANIOS)
 				{
 					this.tipo=tipo;
 				}

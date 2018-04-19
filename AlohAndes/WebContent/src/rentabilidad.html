@@ -1,0 +1,22 @@
+<table class="table table-striped">
+	<thead>
+		<tr>
+			<th>ID</th>
+			<th>{{respuestas[0].datos[0].name}}</th>
+			<th>TotalProductosVendidos</th>
+			<th>TotalFacturado</th>
+			<th>CostoTotal</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr ng-repeat="respuesta in respuestas">
+
+			<td id="{{$index}}-id">{{respuesta.id}}</td>
+			<td id="{{$index}}-nombre"><p> {{respuesta.datos[0].valor}} </p></td>
+			<td id="{{$index}}-desc1"><p> {{respuesta.datos[1].valor}} </p></td>
+			<td id="{{$index}}-desc2"><p> {{respuesta.datos[2].valor}} </p></td>
+			<td id="{{$index}}-precio"><p> {{respuesta.datos[3].valor}} </p></td>
+			
+		</tr>
+	</tbody>
+</table>

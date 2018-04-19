@@ -1,0 +1,19 @@
+<div class="thumbnail">
+	<form ng-submit="buscar()">
+
+		<div class="form-group">
+
+			<p>TIPO DE FILTRO:</p>
+			<select ng-model="selectedOption" ng-options="x.name for x in opciones">
+			</select>
+
+		</div>
+
+		<div class="form-group">
+			<label for="parametro">Parametro </label>
+			<input type="text" id="parametro" name="parametro" ng-model="parametro">
+		</div>
+
+		<button type="submit" class="btn btn-primary">Buscar</button>
+	</form>
+</div>

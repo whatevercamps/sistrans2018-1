@@ -33,7 +33,7 @@ public class DAOTablaClientes {
 		}
 	}
 
-	public void setConn(Connection conn) {
+	public void setConn(Connection conn) throws SQLException {
 		this.conn = conn;
 	}
 
@@ -84,16 +84,19 @@ public class DAOTablaClientes {
 
 
 	public void crearCliente(Cliente cliente) throws SQLException, Exception {
-		
 		String sql = String.format("INSERT INTO CLIENTES(ID, NOMBRE, APELLIDO, AFILIACION) VALUES ('%1$s', '%2$s', '%3$s', '%4$s')",
 														cliente.getCodigo(),
 														cliente.getNombre(),
 														cliente.getApellido(),
 														cliente.getTipo());
 		System.out.println(sql);
+		System.out.println("paso 1");
 		PreparedStatement st = conn.prepareStatement(sql);
+		System.out.println("paso 2");
 		recursos.add(st);
+		System.out.println("paso 3");
 		st.executeQuery();
+		System.out.println("paso 4");
 	}
 
 }

@@ -1,0 +1,20 @@
+<div class="thumbnail">
+	<form ng-submit="buscar()">
+
+		<div class="form-group">
+
+			<p>TIPO DE FILTRO:</p>
+			<select ng-model="selectedOption" ng-options="x.name for x in opciones">
+			</select>
+
+		</div>
+
+		<div class="form-group">
+			
+			<span>Fecha Inicial</span><input type="date" id="initFecha" name="initFecha" ng-model="initFecha" required>
+			<span>Fecha Final</span><input type="date" id="endFecha" name="endFecha" ng-model="endFecha" required>
+		</div>
+
+		<button type="submit" class="btn btn-primary">Buscar</button>
+	</form>
+</div>

@@ -1,10 +1,41 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<title>TutorialParranderos</title>
+<html ng-app="app">
+<head lang="en">
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="http://bootstrapdocs.com/v3.1.1/docs/dist/css/bootstrap.min.css"/>
+
+  
+
+  <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+  <script src="http://bootstrapdocs.com/v3.1.1/docs/dist/js/bootstrap.min.js"></script>
+
+  <!-- JS (load angular, ui-router, and our custom js file) -->
+  <script src="http://code.angularjs.org/1.2.13/angular.js"></script>
+  <script src="//unpkg.com/@uirouter/angularjs/release/angular-ui-router.min.js"></script>
+
+
+  <script src="src/app.js" type="text/javascript"></script> 
+
 </head>
 <body>
-[ST] Tutorial REST
+
+ <nav class="navbar navbar-default" role="navigation">
+  <div class="container-fluid" id="containerNavbar">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+    </div>
+    <div class="collapse navbar-collapse" id="myNavbar">
+      <ul class="nav navbar-nav">
+        <li> <a ui-sref="filterProducto">RFC1</a></li>
+         <li> <a ui-sref="filterRentabilidad">RFC2</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+<div ui-view="filterView"> </div>
+<div ui-view="mainView"> </div>
+
 </body>
 </html>

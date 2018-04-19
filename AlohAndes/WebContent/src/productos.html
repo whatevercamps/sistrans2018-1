@@ -1,0 +1,25 @@
+<table class="table table-striped">
+	<thead>
+		<tr>
+			<th>ID</th>
+			<th>Nombre</th>
+			<th>Descripción</th>
+			<th>Description</th>
+			<th>Precio</th>
+			<th>Categoria</th>
+			<th>costo de producción</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr ng-repeat="producto in productos">
+
+			<td id="{{$index}}-id">{{producto.id}}</td>
+			<td id="{{$index}}-nombre"><p> {{producto.nombre}} </p></td>
+			<td id="{{$index}}-desc1"><p> {{producto.descripcionEspaniol}} </p></td>
+			<td id="{{$index}}-desc2"><p> {{producto.descripcionIngles}} </p></td>
+			<td id="{{$index}}-precio"><p> {{producto.precio}} </p></td>
+			<td id="{{$index}}-categoria"><p> {{producto.categoria}} </p></td>
+			<td id="{{$index}}-costoP"><p> {{producto.costoDeProduccion}} </p></td>
+		</tr>
+	</tbody>
+</table>

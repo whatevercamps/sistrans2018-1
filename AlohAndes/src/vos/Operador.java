@@ -10,11 +10,11 @@ import org.codehaus.jackson.annotate.JsonProperty;
 public class Operador
 {	
 	public final static int CAPACIDAD=100;
-	public static int VIVIENDA_U=1;
-	public static int APARTAMENTO=2;
-	public static int HOTEL=3;
-	public static int HOSTAL=4;
-	public static int RESIDENTES_ALEDANIOS=5;
+	public final static int VIVIENDA_U=1;
+	public final static int APARTAMENTO=2;
+	public final static int HOTEL=3;
+	public final static int HOSTAL=4;
+	public final static int RESIDENTES_ALEDANIOS=5;
 
 	//Atributos 
 	@JsonProperty(value="nombre")

@@ -38,6 +38,7 @@ public class ClienteResorce {
 	@XmlRootElement
 	public static class DatosPago {
 		@XmlElement Double CantPago;
+		@XmlElement Long[] idReservas;
 	}
 
 
@@ -51,7 +52,7 @@ public class ClienteResorce {
 	private String doErrorMessage(Exception e){
 		return "{ \"ERROR\": \""+ e.getMessage() + "\"}" ;
 	}
-	
+
 	@POST
 	@Consumes({ MediaType.APPLICATION_JSON } )
 	@Produces({ MediaType.APPLICATION_JSON } )
@@ -73,7 +74,7 @@ public class ClienteResorce {
 	@Produces({ MediaType.APPLICATION_JSON } )
 	public Response darReservas(@PathParam("id")Long idCliente) throws SQLException, Exception{
 		AlohAndesTM tm = new AlohAndesTM(getPath());
-		
+
 		try {
 			List<Reserva> reservas = tm.darReservasPor(DAOTablaReservas.BUSQUEDA_CLIENTE, idCliente.toString());
 			System.out.println("tam reservas: " + reservas.size());
@@ -83,17 +84,17 @@ public class ClienteResorce {
 			return Response.status( 500 ).entity( doErrorMessage( e ) ).build( );
 		}
 	}
-	
+
 	@POST
-	@Path("{id: \\d+}/reservas")
+	@Path("{id: \\d+}/reservas/reservaUnitaria")
 	@Consumes({ MediaType.APPLICATION_JSON } )
 	@Produces({ MediaType.APPLICATION_JSON } )
 	public Response crearReserva(@PathParam("id")Long idCliente, Reserva reserva) throws SQLException, Exception{
 		System.out.println("entreeeeee");
 		AlohAndesTM tm = new AlohAndesTM(getPath());
-		
+
 		try {
-			tm.crearReserva(idCliente, reserva);
+			tm.reservarPropuestaIndividual(idCliente, reserva);
 
 			return Response.status( 200 ).build();	
 		}catch( Exception e )
@@ -101,7 +102,24 @@ public class ClienteResorce {
 			return Response.status( 500 ).entity( doErrorMessage( e ) ).build( );
 		}
 	}
-	
+
+	@POST 
+	@Path("{id: \\d+}/reservas/reservaColectiva")
+	@Consumes({ MediaType.APPLICATION_JSON } )
+	@Produces({ MediaType.APPLICATION_JSON } )
+	public Response crearReservaColectiva(@PathParam("id")Long idCliente, List<Reserva> reservas) throws SQLException, Exception{
+		AlohAndesTM tm = new AlohAndesTM(getPath());
+
+		try {
+			tm.crearReservaColectiva(idCliente, reservas);
+
+			return Response.status( 200 ).build();	
+		}catch( Exception e )
+		{
+			return Response.status( 500 ).entity( doErrorMessage( e ) ).build( );
+		}
+	}
+
 	@DELETE
 	@Path("{id: \\d+}/reservas/{idReserva: \\d+}")
 	@Consumes({ MediaType.APPLICATION_JSON } )
@@ -116,7 +134,25 @@ public class ClienteResorce {
 		{
 			return Response.status( 500 ).entity( doErrorMessage( e ) ).build( );
 		}
-		
+
+	}
+	
+	
+	@DELETE
+	@Path("{id: \\d+}/TerminarReservas")
+	@Consumes({ MediaType.APPLICATION_JSON } )
+	@Produces({ MediaType.APPLICATION_JSON } )
+	public Response terminarReservaColectiva(@PathParam("id")Long idCliente, DatosPago datos) throws SQLException, Exception{
+		AlohAndesTM tm = new AlohAndesTM(getPath());
+		try {
+			tm.terminarReservaColectiva(idCliente, datos.idReservas, datos.CantPago);
+
+			return Response.status( 200 ).build();	
+		}catch( Exception e )
+		{
+			return Response.status( 500 ).entity( doErrorMessage( e ) ).build( );
+		}
+
 	}
 
 }

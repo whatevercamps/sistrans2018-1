@@ -121,7 +121,7 @@ public class DAOTablaFacturas {
 	public void actualizarPago(Double precioActual, Long id) throws SQLException, Exception {
 		
 		
-		String sql = "UPDATE FACTURAS SET COSTO_TOTAL = " + precioActual;
+		String sql = "UPDATE FACTURAS SET COSTO_TOTAL = COSTO_TOTAL + " + precioActual;
 		sql += " WHERE ID IN (SELECT FA.ID FROM FACTURAS FA, RESERVAS RE WHERE RE.ID_FACTURA = FA.ID AND RE.ID = " + id + ")";
 		PreparedStatement st = conn.prepareStatement(sql);
 		recursos.add(st);

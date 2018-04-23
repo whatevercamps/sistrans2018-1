@@ -15,6 +15,7 @@ import java.io.FileInputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.sql.Savepoint;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -88,6 +89,10 @@ public class AlohAndesTM {
 	 */
 	private Connection conn;
 
+	/**
+	 * Atributo que dará el último estado correcto de la base de datos.
+	 */
+	private Savepoint savepoint;
 
 	/**
 	 * Metodo constructor de la clase RotondAndesMaster, esta clase modela y contiene cada una de las 
@@ -148,12 +153,13 @@ public class AlohAndesTM {
 		Cliente ret = null;
 		boolean conexionPropia = false; 
 		try {
-			
-			if (this.conn == null) {
+
+			if (this.conn == null || this.conn.isClosed()) {
 				this.conn = darConexion(); conexionPropia = true; 
 				conexionPropia = true;
+				this.conn.setAutoCommit(false);
 			}
-			//this.conn.setAutoCommit(false);
+
 			dao.setConn(conn);
 			ret = dao.darCliente(id);
 
@@ -188,31 +194,34 @@ public class AlohAndesTM {
 			if (buscarClientePorId(cliente.getCodigo()) != null) {
 				throw new Exception("Ya hay un cliente con ese c�digo");
 			}
-
-			this.conn = darConexion(); conexionPropia = true; 
-			this.conn.setAutoCommit(false);
+			if(this.conn == null || this.conn.isClosed()){
+				this.conn = darConexion(); 
+				conexionPropia = true; 
+				this.conn.setAutoCommit(false);
+				this.conn.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
+			}
 			dao.setConn(conn);
-			
+
 			dao.crearCliente(cliente);
 
 			System.out.println("lo creo");
 			//verificar 
 
 			ret = buscarClientePorId(cliente.getCodigo());
-			
+
 			if(ret == null) {
-				this.conn.rollback();
 				throw new Exception("No se guard� correctamente el cliente, revisar xd...");
 			}
 
 			this.conn.commit();
 
-
 		}  catch (SQLException e) {
+			this.conn.rollback();
 			System.err.println("SQLException:" + e.getMessage());
 			e.printStackTrace();
 			throw e;
 		} catch (Exception e) {
+			this.conn.rollback();
 			System.err.println("GeneralException:" + e.getMessage());
 			e.printStackTrace();
 			throw e;
@@ -236,7 +245,7 @@ public class AlohAndesTM {
 		DAOTablaOperadores dao = new DAOTablaOperadores();
 		boolean ret = false;
 		try {
-			this.conn = darConexion(); conexionPropia = true; this.conn.setAutoCommit(false);
+			if (this.conn == null || this.conn.isClosed()) {this.conn = darConexion(); conexionPropia = true; this.conn.setAutoCommit(false);}
 			dao.setConn(conn);
 			ret = dao.existeOperadorPorId(id);
 
@@ -273,9 +282,15 @@ public class AlohAndesTM {
 				throw new Exception("Ya hay un operador con ese c�digo");
 			}
 
-			this.conn = darConexion(); conexionPropia = true; this.conn.setAutoCommit(false);
-			dao.setConn(conn);
 
+			if (this.conn == null || this.conn.isClosed()) {
+				this.conn = darConexion(); 
+				conexionPropia = true; 
+				this.conn.setAutoCommit(false);
+				this.conn.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
+			}
+
+			dao.setConn(conn);
 			dao.crearApartamento(apartamento);
 
 			System.out.println("lo creo");
@@ -285,11 +300,15 @@ public class AlohAndesTM {
 			if(!existeOperadorPorId(apartamento.getId())) {
 				throw new Exception("No se guard� correctamente el apartamento, revisar xd...");
 			}
+
+			this.conn.commit(); 
 		}  catch (SQLException e) {
+			this.conn.rollback();
 			System.err.println("SQLException:" + e.getMessage());
 			e.printStackTrace();
 			throw e;
 		} catch (Exception e) {
+			this.conn.rollback();
 			System.err.println("GeneralException:" + e.getMessage());
 			e.printStackTrace();
 			throw e;
@@ -317,7 +336,12 @@ public class AlohAndesTM {
 				throw new Exception("Ya hay un cliente con ese c�digo");
 			}
 
-			this.conn = darConexion(); conexionPropia = true; this.conn.setAutoCommit(false);
+			if (this.conn == null || this.conn.isClosed()) {
+				this.conn = darConexion(); 
+				conexionPropia = true; 
+				this.conn.setAutoCommit(false);
+				this.conn.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
+			}
 			dao.setConn(conn);
 
 			dao.crearHotel(hotel);
@@ -329,11 +353,16 @@ public class AlohAndesTM {
 			if(!existeOperadorPorId(hotel.getId())) {
 				throw new Exception("No se guard� correctamente el hotel, revisar xd...");
 			}
+
+			this.conn.commit();
+
 		}  catch (SQLException e) {
+			this.conn.rollback();
 			System.err.println("SQLException:" + e.getMessage());
 			e.printStackTrace();
 			throw e;
 		} catch (Exception e) {
+			this.conn.rollback();
 			System.err.println("GeneralException:" + e.getMessage());
 			e.printStackTrace();
 			throw e;
@@ -362,7 +391,12 @@ public class AlohAndesTM {
 				throw new Exception("Ya hay un cliente con ese c�digo");
 			}
 
-			this.conn = darConexion(); conexionPropia = true; this.conn.setAutoCommit(false);
+			if (this.conn == null || this.conn.isClosed()) {
+				this.conn = darConexion(); 
+				conexionPropia = true; 
+				this.conn.setAutoCommit(false);
+				this.conn.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
+			}
 			dao.setConn(conn);
 
 			dao.crearHostal(hostal);
@@ -374,11 +408,16 @@ public class AlohAndesTM {
 			if(!existeOperadorPorId(hostal.getId())) {
 				throw new Exception("No se guard� correctamente el hotel, revisar xd...");
 			}
+
+			this.conn.commit();
+
 		}  catch (SQLException e) {
+			this.conn.rollback();
 			System.err.println("SQLException:" + e.getMessage());
 			e.printStackTrace();
 			throw e;
 		} catch (Exception e) {
+			this.conn.rollback();
 			System.err.println("GeneralException:" + e.getMessage());
 			e.printStackTrace();
 			throw e;
@@ -405,7 +444,12 @@ public class AlohAndesTM {
 				throw new Exception("Ya hay un cliente con ese c�digo");
 			}
 
-			this.conn = darConexion(); conexionPropia = true; this.conn.setAutoCommit(false);
+			if (this.conn == null || this.conn.isClosed()) {
+				this.conn = darConexion(); 
+				conexionPropia = true; 
+				this.conn.setAutoCommit(false);
+				this.conn.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
+			}
 			dao.setConn(conn);
 
 			dao.crearVecino(vecino);
@@ -417,11 +461,16 @@ public class AlohAndesTM {
 			if(!existeOperadorPorId(vecino.getId())) {
 				throw new Exception("No se guard� correctamente el hotel, revisar xd...");
 			}
+
+			this.conn.commit();
+
 		}  catch (SQLException e) {
+			this.conn.rollback();
 			System.err.println("SQLException:" + e.getMessage());
 			e.printStackTrace();
 			throw e;
 		} catch (Exception e) {
+			this.conn.rollback();
 			System.err.println("GeneralException:" + e.getMessage());
 			e.printStackTrace();
 			throw e;
@@ -448,7 +497,12 @@ public class AlohAndesTM {
 				throw new Exception("Ya hay un cliente con ese c�digo");
 			}
 
-			this.conn = darConexion(); conexionPropia = true; this.conn.setAutoCommit(false);
+			if (this.conn == null || this.conn.isClosed()) {
+				this.conn = darConexion(); 
+				conexionPropia = true;
+				this.conn.setAutoCommit(false);
+				this.conn.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
+			}
 			dao.setConn(conn);
 
 			dao.crearViviendaUni(viviendaUniversitaria);
@@ -460,6 +514,8 @@ public class AlohAndesTM {
 			if(!existeOperadorPorId(viviendaUniversitaria.getId())) {
 				throw new Exception("No se guard� correctamente el hotel, revisar xd...");
 			}
+
+			this.conn.commit();
 		}  catch (SQLException e) {
 			System.err.println("SQLException:" + e.getMessage());
 			e.printStackTrace();
@@ -486,15 +542,27 @@ public class AlohAndesTM {
 		DAOTablaPropuestas dao = new DAOTablaPropuestas();
 		boolean ret = false;
 		try {
-			this.conn = darConexion(); conexionPropia = true; this.conn.setAutoCommit(false);
+			if (this.conn == null || this.conn.isClosed()) {
+				this.conn = darConexion(); 
+				conexionPropia = true; 
+				this.conn.setAutoCommit(false);
+				this.conn.setTransactionIsolation(Connection.TRANSACTION_READ_UNCOMMITTED);
+			}
 			dao.setConn(conn);
 			ret = dao.existePropuestaPorId(id);
 
+			if(conexionPropia)
+				this.conn.commit();
+
 		} catch (SQLException e) {
+			if(conexionPropia)
+				this.conn.rollback();
 			System.err.println("SQLException:" + e.getMessage());
 			e.printStackTrace();
 			throw e;
 		} catch (Exception e) {
+			if(conexionPropia)
+				this.conn.rollback();
 			System.err.println("GeneralException:" + e.getMessage());
 			e.printStackTrace();
 			throw e;
@@ -527,13 +595,19 @@ public class AlohAndesTM {
 			}
 
 			//proc
-			this.conn = darConexion(); conexionPropia = true; this.conn.setAutoCommit(false);
-			dao.setConn(conn);
+			if (this.conn == null || this.conn.isClosed()) {
+				this.conn = darConexion(); 
+				conexionPropia = true; 
+				this.conn.setAutoCommit(false);
+				this.conn.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
+			}
 
+			dao.setConn(conn);
 			dao.crearPropuesta(propuesta, idOperador);
 
 			System.out.println("lo creo");
 
+			this.conn.setSavepoint();
 
 			//asignar servicios a propuestas
 
@@ -548,11 +622,15 @@ public class AlohAndesTM {
 				throw new Exception("No se guard� correctamente la propuesta, revisar xd...");
 			}
 
+			this.conn.commit();
+
 		}  catch (SQLException e) {
+			this.conn.rollback();
 			System.err.println("SQLException:" + e.getMessage());
 			e.printStackTrace();
 			throw e;
 		} catch (Exception e) {
+			this.conn.rollback();
 			System.err.println("GeneralException:" + e.getMessage());
 			e.printStackTrace();
 			throw e;
@@ -570,47 +648,13 @@ public class AlohAndesTM {
 
 	}
 
-	public void agregarServiciosAPropuesta(Propuesta propuesta, List<Servicio> servicios) throws SQLException, Exception{
-		boolean conexionPropia = false; 
-		DAOTablaServicios dao = new DAOTablaServicios();
-
-		try {
-			for(Servicio ser : servicios) {
-				if(!existeServicioPorId(ser.getId())) {
-					throw new Exception("No existe el servicio con el id");
-				}
-
-				dao.conectarServicioAPropuesta(ser.getId(), propuesta.getId());
-			}
-
-		}  catch (SQLException e) {
-			System.err.println("SQLException:" + e.getMessage());
-			e.printStackTrace();
-			throw e;
-		} catch (Exception e) {
-			System.err.println("GeneralException:" + e.getMessage());
-			e.printStackTrace();
-			throw e;
-		}finally {
-			try {
-				dao.cerrarRecursos();
-				if(this.conn!=null && conexionPropia)
-					this.conn.close();
-			} catch (SQLException exception) {
-				System.err.println("SQLException closing resources:" + exception.getMessage());
-				exception.printStackTrace();
-				throw exception;
-			}
-		}
-
-	}
 
 	public boolean existeServicioPorId(Long id) throws SQLException, Exception{
 		boolean conexionPropia = false; 
 		DAOTablaServicios dao = new DAOTablaServicios();
 		boolean ret = false;
 		try {
-			this.conn = darConexion(); conexionPropia = true; this.conn.setAutoCommit(false);
+			if (this.conn == null || this.conn.isClosed()) {this.conn = darConexion(); conexionPropia = true; this.conn.setAutoCommit(false);}
 			dao.setConn(conn);
 			ret = dao.existeServicioPorId(id);
 
@@ -636,30 +680,94 @@ public class AlohAndesTM {
 		return ret;
 	}
 
-	public void crearReserva(Long idCliente, Reserva reserva)  throws SQLException, Exception{
-		boolean conexionPropia = false; 
+	public void reservarPropuestaIndividual(Long idCliente, Reserva reserva)throws SQLException, Exception{
+		boolean conexionPropia = false;
+		DAOTablaReservas dao = new DAOTablaReservas();
 
-		if(existeReservaEnConflicto(idCliente, reserva.getPropuesta().getId(), reserva.getFechaInicial(), reserva.getFechaFinal())) {
-			throw new Exception("Ya existe una reserva de esta propuesta para este cliente");
+		try {
+			if (this.conn == null || this.conn.isClosed()) {
+				this.conn = darConexion(); 
+				conexionPropia = true;
+				this.conn.setAutoCommit(false);
+				this.conn.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
+			}
+
+
+			if(conexionPropia)
+				this.savepoint = this.conn.setSavepoint();
+
+			Long idFactura =crearFactura(idCliente);
+
+			crearReserva(idFactura, idCliente, reserva);
+
+			if(conexionPropia)
+				this.conn.commit();
+			else
+				this.savepoint = this.conn.setSavepoint();
+
+		} catch (SQLException e) {
+			this.conn.rollback(savepoint);
+			System.err.println("SQLException:" + e.getMessage());
+			e.printStackTrace();
+			throw e;
+		} catch (Exception e) {
+			this.conn.rollback(savepoint);
+			System.err.println("GeneralException:" + e.getMessage());
+			e.printStackTrace();
+			throw e;
+		}finally {
+			try {
+				dao.cerrarRecursos();
+				if(this.conn!=null && conexionPropia)
+					this.conn.close();
+			} catch (SQLException exception) {
+				System.err.println("SQLException closing resources:" + exception.getMessage());
+				exception.printStackTrace();
+				throw exception;
+			}
 		}
 
-		Long idFactura = crearFactura(idCliente);
+	}
+
+
+	public void crearReserva(Long idFactura, Long idCliente, Reserva reserva)  throws SQLException, Exception{
+
+
+		boolean conexionPropia = false; 
 
 		DAOTablaReservas dao = new DAOTablaReservas();
 
 		//reglas de negocio
 
 		try {
-			this.conn = darConexion(); conexionPropia = true; this.conn.setAutoCommit(false);
+			if (this.conn == null || this.conn.isClosed()) {
+				this.conn = darConexion(); 
+				conexionPropia = true;
+				this.conn.setAutoCommit(false);
+				this.conn.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
+			}
+
+
+
+			if(existeReservaEnConflicto(idCliente, reserva.getPropuesta().getId(), reserva.getFechaInicial(), reserva.getFechaFinal())) {
+				throw new Exception("Ya existe una reserva de esta propuesta para este cliente");
+			}
+
 			dao.setConn(conn);
 			dao.crearReserva(idFactura, reserva);
 
+			if(conexionPropia)
+				this.conn.commit();
+			else
+				this.savepoint = this.conn.setSavepoint();
 
 		} catch (SQLException e) {
+			this.conn.rollback(savepoint);
 			System.err.println("SQLException:" + e.getMessage());
 			e.printStackTrace();
 			throw e;
 		} catch (Exception e) {
+			this.conn.rollback(savepoint);
 			System.err.println("GeneralException:" + e.getMessage());
 			e.printStackTrace();
 			throw e;
@@ -681,26 +789,39 @@ public class AlohAndesTM {
 		Long index = null;
 		DAOTablaFacturas dao = new DAOTablaFacturas();
 		try {
-			this.conn = darConexion(); conexionPropia = true; this.conn.setAutoCommit(false);
+			if (this.conn == null || this.conn.isClosed()) {
+				this.conn = darConexion(); 
+				conexionPropia = true; 
+				this.conn.setAutoCommit(false);
+				this.conn.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
+			}
+
+
+
 			dao.setConn(conn);
+
 			SimpleDateFormat dtf = new SimpleDateFormat("yyyy-MM-dd");
 			Date hoy = new Date();
 
 			index = dao.crearFactura(idCliente, dtf.format(hoy));
 
 		} catch (SQLException e) {
+			this.conn.rollback(savepoint);
 			System.err.println("SQLException:" + e.getMessage());
 			e.printStackTrace();
 			throw e;
 		} catch (Exception e) {
+			this.conn.rollback(savepoint);
 			System.err.println("GeneralException:" + e.getMessage());
 			e.printStackTrace();
 			throw e;
 		}finally {
 			try {
 				dao.cerrarRecursos();
-				if(this.conn!=null && conexionPropia)
+				if(this.conn!=null && conexionPropia){
+					this.conn.commit();
 					this.conn.close();
+				}
 			} catch (SQLException exception) {
 				System.err.println("SQLException closing resources:" + exception.getMessage());
 				exception.printStackTrace();
@@ -716,7 +837,7 @@ public class AlohAndesTM {
 		DAOTablaReservas dao = new DAOTablaReservas();
 		boolean ret = false;
 		try {
-			this.conn = darConexion(); conexionPropia = true; this.conn.setAutoCommit(false);
+			if (this.conn == null || this.conn.isClosed()) {this.conn = darConexion(); conexionPropia = true; this.conn.setAutoCommit(false);}
 			dao.setConn(conn);
 			ret = dao.existeReservaPropuestaCliente(idCliente, idProp, fechaIn, fechaFi);
 
@@ -752,7 +873,7 @@ public class AlohAndesTM {
 		}
 
 		try {
-			this.conn = darConexion(); conexionPropia = true; this.conn.setAutoCommit(false);
+			if (this.conn == null || this.conn.isClosed()) {this.conn = darConexion(); conexionPropia = true; this.conn.setAutoCommit(false);}
 			dao.setConn(conn);
 			reservas = dao.darReservasPor(filtro, parametro);
 			System.out.println("reservas...");
@@ -790,7 +911,7 @@ public class AlohAndesTM {
 		DAOTablaPropuestas dao = new DAOTablaPropuestas();
 
 		try {
-			this.conn = darConexion(); conexionPropia = true; this.conn.setAutoCommit(false);
+			if (this.conn == null || this.conn.isClosed()) {this.conn = darConexion(); conexionPropia = true; this.conn.setAutoCommit(false);}
 			dao.setConn(conn);
 			propuestas = dao.darPropuestasPor(filtro, parametro);
 
@@ -827,7 +948,7 @@ public class AlohAndesTM {
 		DAOTablaServicios dao = new DAOTablaServicios();
 
 		try {
-			this.conn = darConexion(); conexionPropia = true; this.conn.setAutoCommit(false);
+			if (this.conn == null || this.conn.isClosed()) {this.conn = darConexion(); conexionPropia = true; this.conn.setAutoCommit(false);}
 			dao.setConn(conn);
 			servicios = dao.darServiciosPor(filtro, parametro);
 
@@ -856,16 +977,58 @@ public class AlohAndesTM {
 	}
 
 	public void terminarReserva(Long idCliente, Long idReserva, Double cantPago) throws SQLException, Exception{
-		List<Reserva> reservas = darReservasPor(DAOTablaReservas.BUSQUEDA_CLIENTE_ID_RESERVA_ID,  idCliente + "," + idReserva);
-		if( reservas.isEmpty()) {
-			throw new Exception("El cliente no tiene una reserva con dicho id");
-		}
-		actualizarCostoTotal(reservas.get(0));
-		boolean fin = cancelarFactura(idReserva, cantPago);
-		if (fin) 
-			eliminarReserva(reservas.get(0));
-		else {
-			throw new Exception("El dinero no es suficiente, se abon� pero no se termin� la reserva.");
+		boolean conexionPropia = false;
+		try{
+			if (this.conn == null || this.conn.isClosed()) {
+				this.conn = darConexion(); 
+				conexionPropia = true; 
+				this.conn.setAutoCommit(false);
+				this.conn.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
+				this.savepoint = this.conn.setSavepoint();
+			}
+
+			List<Reserva> reservas = darReservasPor(DAOTablaReservas.BUSQUEDA_CLIENTE_ID_RESERVA_ID,  idCliente + "," + idReserva);
+
+			if( reservas.isEmpty()) 
+				throw new Exception("El cliente no tiene una reserva con dicho id");
+
+			actualizarCostoTotal(reservas.get(0));
+
+			//this.savepoint = this.conn.setSavepoint(); 
+			//se comenta para evitar que el precio se aumente cada vez que el dinero no es suficiente
+
+			boolean fin = cancelarFactura(idReserva, cantPago);
+
+			if (fin) {
+				eliminarReserva(reservas.get(0));
+			}
+			else 
+				throw new Exception("El dinero no es suficiente");
+
+			if(conexionPropia)
+				this.conn.commit();
+
+		}catch (SQLException e) {
+			if(conexionPropia)
+				this.conn.rollback(this.savepoint);
+			System.err.println("SQLException:" + e.getMessage());
+			e.printStackTrace();
+			throw e;
+		} catch (Exception e) {
+			if(conexionPropia)
+				this.conn.rollback(this.savepoint);
+			System.err.println("GeneralException:" + e.getMessage());
+			e.printStackTrace();
+			throw e;
+		} finally {
+			try {
+				if(this.conn!=null && conexionPropia)
+					this.conn.close();
+			} catch (SQLException exception) {
+				System.err.println("SQLException closing resources:" + exception.getMessage());
+				exception.printStackTrace();
+				throw exception;
+			}
 		}
 	}
 
@@ -883,7 +1046,7 @@ public class AlohAndesTM {
 		DAOTablaPropuestas dao = new DAOTablaPropuestas();
 
 		try {
-			this.conn = darConexion(); conexionPropia = true; this.conn.setAutoCommit(false);
+			if (this.conn == null || this.conn.isClosed()) {this.conn = darConexion(); conexionPropia = true; this.conn.setAutoCommit(false);}
 			dao.setConn(conn);
 
 			dao.retirarPropuesta(idPropuesta);
@@ -910,11 +1073,271 @@ public class AlohAndesTM {
 
 	}
 
+	public void crearReservaColectiva(Long idCliente, List<Reserva> reservas) throws SQLException, Exception {
+
+		boolean conexionPropia = false;
+		try {
+			if (this.conn == null || this.conn.isClosed()) {
+				this.conn = darConexion(); 
+				conexionPropia = true; 
+				this.conn.setAutoCommit(false);
+				this.conn.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
+			}
+
+			this.savepoint = this.conn.setSavepoint();
+
+			Long idFactura = crearFactura(idCliente);
+
+			if(reservas.isEmpty())
+				throw new Exception("La lista de reservas está vacía");
+
+			for(Reserva r : reservas){
+				crearReserva(idFactura, idCliente, r);
+				this.savepoint = this.conn.setSavepoint();
+			}
+
+			if(conexionPropia)
+				this.conn.commit();
+
+		}catch (SQLException e) {
+			this.conn.rollback(savepoint);
+			System.err.println("SQLException:" + e.getMessage());
+			e.printStackTrace();
+			throw e;
+		} catch (Exception e) {
+			this.conn.rollback(savepoint);
+			System.err.println("GeneralException:" + e.getMessage());
+			e.printStackTrace();
+			throw e;
+		} finally {
+			try {
+				if(this.conn!=null && conexionPropia)
+					this.conn.close();
+			} catch (SQLException exception) {
+				System.err.println("SQLException closing resources:" + exception.getMessage());
+				exception.printStackTrace();
+				throw exception;
+			}
+		}
+	}
+
+	public void terminarReservaColectiva(Long idCliente, Long[] idReservas, Double cantPago) throws SQLException, Exception{
+		boolean conexionPropia = false;
+
+		try {
+			if (this.conn == null || this.conn.isClosed()) {
+				this.conn = darConexion(); 
+				conexionPropia = true; 
+				this.conn.setAutoCommit(false);
+				this.conn.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
+			}
+
+			this.savepoint = this.conn.setSavepoint();
+
+
+
+			for(Long idReserva : idReservas){
+
+				List<Reserva> reservas = darReservasPor(DAOTablaReservas.BUSQUEDA_CLIENTE_ID_RESERVA_ID,  idCliente + "," + idReserva);
+				if(reservas.isEmpty())
+					throw new Exception("No existe la reserva con el id " + idReserva);
+
+				Double precReserva = calcularPrecioActual(saberFechasYDiasCancelacionMillis(idReserva), reservas.get(0));
+				System.out.println("CantPago: " + cantPago);
+				System.out.println("PrecReserva: " + precReserva);
+				cantPago = cantPago - precReserva;
+				System.out.println("Restante: " + cantPago);
+				if(cantPago < 0 && idReservas[idReservas.length - 1] != idReserva)
+					throw new Exception("El dinero no es suficiente para terminar de pagar las reservas. Sin embargo, se pagaron hasta donde alcanzó.");
+
+				if(idReservas[idReservas.length - 1] == idReserva)
+					precReserva += cantPago;
+
+				terminarReserva(idCliente, idReserva, precReserva);
+				this.savepoint = this.conn.setSavepoint();
+			}
+
+
+			if(conexionPropia)
+				this.conn.commit();
+
+		}catch (SQLException e) {
+			this.conn.rollback(savepoint);
+			System.err.println("SQLException:" + e.getMessage());
+			e.printStackTrace();
+			throw e;
+		} catch (Exception e) {
+			this.conn.rollback(savepoint);
+			System.err.println("GeneralException:" + e.getMessage());
+			e.printStackTrace();
+			throw e;
+		} finally {
+			try {
+				if(this.conn!=null && conexionPropia)
+					this.conn.close();
+			} catch (SQLException exception) {
+				System.err.println("SQLException closing resources:" + exception.getMessage());
+				exception.printStackTrace();
+				throw exception;
+			}
+		}
+	}
+
+
+	public void inhabilitaroferta(Long idOferta) throws SQLException, Exception {
+		boolean conexionPropia = false;
+		try {
+			if (this.conn == null || this.conn.isClosed()) {
+				this.conn = darConexion(); 
+				conexionPropia = true; 
+				this.conn.setAutoCommit(false);
+				this.conn.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
+				this.savepoint = this.conn.setSavepoint();
+			}
+
+			List<Reserva> reservasEnPeligro = darReservasPor(DAOTablaReservas.BUSQUEDA_PROPUESTA, idOferta.toString());
+			List<Reserva> reservasCanceladas = new ArrayList<Reserva>();
+			for(Reserva res : reservasEnPeligro) {
+				if(!reubicarCancelarReserva(res))
+					reservasCanceladas.add(res);
+				this.savepoint = this.conn.setSavepoint();
+			}
+
+			if(conexionPropia)
+				this.conn.commit();
+
+		}catch (SQLException e) {
+			if(conexionPropia)
+				this.conn.rollback(this.savepoint);
+			System.err.println("SQLException:" + e.getMessage());
+			e.printStackTrace();
+			throw e;
+		} catch (Exception e) {
+			if(conexionPropia)
+				this.conn.rollback(this.savepoint);
+			System.err.println("GeneralException:" + e.getMessage());
+			e.printStackTrace();
+			throw e;
+		} finally {
+			try {
+				if(this.conn!=null && conexionPropia)
+					this.conn.close();
+			} catch (SQLException exception) {
+				System.err.println("SQLException closing resources:" + exception.getMessage());
+				exception.printStackTrace();
+				throw exception;
+			}
+		}
+	}
+
+	public List<Cliente> darClientesPor(int filtro, String parametro) throws SQLException, Exception{
+		boolean conexionPropia = false; 
+		List<Cliente> clientes = new ArrayList<>(); 
+		DAOTablaClientes dao = new DAOTablaClientes();
+
+		try {
+			if (this.conn == null || this.conn.isClosed()) {
+				this.conn = darConexion(); 
+				conexionPropia = true; 
+				this.conn.setAutoCommit(false);
+			}
+			dao.setConn(conn);
+			clientes = dao.darClientesPor(filtro, parametro);
+
+			for(Cliente c : clientes) {
+				//agregar facturas
+			}
+
+		}catch (SQLException e) {
+			System.err.println("SQLException:" + e.getMessage());
+			e.printStackTrace();
+			throw e;
+		} catch (Exception e) {
+			System.err.println("GeneralException:" + e.getMessage());
+			e.printStackTrace();
+			throw e;
+		} finally {
+			try {
+
+				dao.cerrarRecursos();
+				if(this.conn!=null && conexionPropia)
+					this.conn.close();
+			} catch (SQLException exception) {
+				System.err.println("SQLException closing resources:" + exception.getMessage());
+				exception.printStackTrace();
+				throw exception;
+			}
+		}
+		return clientes; 
+	}
+
+
+	private boolean reubicarCancelarReserva(Reserva res) throws SQLException, Exception{
+		List<Propuesta> propuestasSimilares = darPropuestasPor(DAOTablaPropuestas.PROPUESTAS_DISPONIBLES_DE_TIPO, res.getPropuesta().getTipo().toString());
+		if(propuestasSimilares.isEmpty()){
+			terminarReservaEmergencia(res);
+			return false;
+		}
+		else {
+			Cliente cli = darClientesPor(DAOTablaClientes.BUSQUEDA_POR_RESERVA, res.getId().toString()).get(0);
+			res.setPropuesta(propuestasSimilares.get(0));
+			reservarPropuestaIndividual(cli.getCodigo(), res);
+			return true;
+		}
+	}
+
+
+
+	private void terminarReservaEmergencia(Reserva res) throws SQLException, Exception{
+
+		Double cantPago = actualizarCostoTotal(res);
+		cancelarFactura(res.getId(), cantPago + 0.69);
+		eliminarReserva(res);		
+	}
+
+	private void agregarServiciosAPropuesta(Propuesta propuesta, List<Servicio> servicios) throws SQLException, Exception{
+		boolean conexionPropia = false; 
+		DAOTablaServicios dao = new DAOTablaServicios();
+
+		try {
+			for(Servicio ser : servicios) {
+				if(!existeServicioPorId(ser.getId())) {
+					throw new Exception("No existe el servicio con el id");
+				}
+
+
+				dao.conectarServicioAPropuesta(ser.getId(), propuesta.getId());
+			}
+
+		}  catch (SQLException e) {
+			System.err.println("SQLException:" + e.getMessage());
+			e.printStackTrace();
+			throw e;
+		} catch (Exception e) {
+			System.err.println("GeneralException:" + e.getMessage());
+			e.printStackTrace();
+			throw e;
+		}finally {
+			try {
+				dao.cerrarRecursos();
+				if(this.conn!=null && conexionPropia)
+					this.conn.close();
+			} catch (SQLException exception) {
+				System.err.println("SQLException closing resources:" + exception.getMessage());
+				exception.printStackTrace();
+				throw exception;
+			}
+		}
+
+	}
+
+
+
 	private void eliminarReserva(Reserva reserva) throws SQLException, Exception{
 		boolean conexionPropia = false; 
 		DAOTablaReservas dao = new DAOTablaReservas();
 		try {
-			this.conn = darConexion(); conexionPropia = true; this.conn.setAutoCommit(false);
+			if (this.conn == null || this.conn.isClosed()) {this.conn = darConexion(); conexionPropia = true; this.conn.setAutoCommit(false);}
 			dao.setConn(conn);
 
 			dao.eliminarReserva(reserva.getId());
@@ -940,15 +1363,22 @@ public class AlohAndesTM {
 		}
 	}
 
-	private void actualizarCostoTotal(Reserva reserva) throws SQLException, Exception{
+	private Double actualizarCostoTotal(Reserva reserva) throws SQLException, Exception{
 		boolean conexionPropia = false; 
-		Long[] dias = saberFechasYDiasCancelacionMillis(reserva);
+		Long[] dias = saberFechasYDiasCancelacionMillis(reserva.getId());
 		Double precioActual = calcularPrecioActual(dias, reserva);
 
 		DAOTablaFacturas dao = new DAOTablaFacturas();
 
 		try {
-			this.conn = darConexion(); conexionPropia = true; this.conn.setAutoCommit(false);
+			if (this.conn == null || this.conn.isClosed()) {
+				this.conn = darConexion(); conexionPropia = true; 
+				this.conn.setAutoCommit(false);
+				this.conn.setTransactionIsolation(Connection.TRANSACTION_READ_UNCOMMITTED);
+				this.savepoint = this.conn.setSavepoint();
+			}
+
+
 			dao.setConn(conn);
 
 			dao.actualizarPago(precioActual, reserva.getId());
@@ -972,9 +1402,8 @@ public class AlohAndesTM {
 				throw exception;
 			}
 		}
-
+		return precioActual;
 	}
-
 
 
 	private Double calcularPrecioActual(Long[] dias, Reserva reserva) throws SQLException, Exception {
@@ -993,14 +1422,14 @@ public class AlohAndesTM {
 
 	}
 
-	private Long[] saberFechasYDiasCancelacionMillis(Reserva reserva) throws SQLException, Exception{
+	private Long[] saberFechasYDiasCancelacionMillis(Long idReserva) throws SQLException, Exception{
 		boolean conexionPropia = false; 
 		DAOTablaPropuestas dao = new DAOTablaPropuestas();
 		Long[] dias = new Long[4];
 		try {
-			this.conn = darConexion(); conexionPropia = true; this.conn.setAutoCommit(false);
+			if (this.conn == null || this.conn.isClosed()) {this.conn = darConexion(); conexionPropia = true; this.conn.setAutoCommit(false);}
 			dao.setConn(conn);
-			dias = dao.saberDiasCancelacionYFechasMillis(reserva.getId());
+			dias = dao.saberDiasCancelacionYFechasMillis(idReserva);
 
 
 		}catch (SQLException e) {
@@ -1031,7 +1460,13 @@ public class AlohAndesTM {
 		DAOTablaFacturas dao = new DAOTablaFacturas();
 		boolean ret = false;
 		try {
-			this.conn = darConexion(); conexionPropia = true; this.conn.setAutoCommit(false);
+			if (this.conn == null || this.conn.isClosed()) {
+				this.conn = darConexion(); 
+				conexionPropia = true; 
+				this.conn.setAutoCommit(false);
+
+			}
+
 			dao.setConn(conn);
 			Double restante = dao.abonarFactura(idReserva, cantPago);
 			if(restante <= 0)
@@ -1069,6 +1504,9 @@ public class AlohAndesTM {
 
 		return false;
 	}
+
+
+
 
 
 

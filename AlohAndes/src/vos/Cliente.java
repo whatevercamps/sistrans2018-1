@@ -69,6 +69,9 @@ public class Cliente {
 			this.historia=historia;
 		}
 	}
+	public Cliente() {
+		// TODO Auto-generated constructor stub
+	}
 	//Metodos getter y setter
 	/**
 	 * 

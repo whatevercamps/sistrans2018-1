@@ -89,7 +89,7 @@ public class OperadorResource {
 	@Path("/hostales")
 	@Consumes({ MediaType.APPLICATION_JSON } )
 	@Produces({ MediaType.APPLICATION_JSON } )
-	public Response crearApartamento(Hostal hostal) throws SQLException, Exception{
+	public Response crearHostal(Hostal hostal) throws SQLException, Exception{
 		AlohAndesTM tm = new AlohAndesTM(getPath());
 
 		try {

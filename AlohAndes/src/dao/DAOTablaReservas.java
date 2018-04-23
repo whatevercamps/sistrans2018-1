@@ -22,7 +22,7 @@ import vos.Reserva;
 
 
 public class DAOTablaReservas {
-	public static final int BUSQUEDA_PROPUESTA = 0;
+	public static final int BUSQUEDA_PROPUESTA = 4;
 	public static final int BUSQUEDA_CLIENTE = 1;
 	public static final int BUSQUEDA_ID = 2;
 	public static final int BUSQUEDA_CLIENTE_ID_RESERVA_ID = 3;
@@ -74,7 +74,7 @@ public class DAOTablaReservas {
 	public void crearReserva(Long idFactura, Reserva reserva) throws SQLException, Exception {
 
 		SimpleDateFormat dtf = new SimpleDateFormat("yyyy-MM-dd");
-		String sql = String.format("INSERT INTO RESERVAS(ID, ID_FACTURA, ID_PROPUESTA, FECHA_INIC, FECHA_FINA) VALUES (%1$s, %2$s, %3$s, TO_DATE('%4$s', 'yyyy-mm-dd'), TO_DATE( '%4$s', 'yyyy-mm-dd'))",
+		String sql = String.format("INSERT INTO RESERVAS(ID, ID_FACTURA, ID_PROPUESTA, FECHA_INIC, FECHA_FINA) VALUES (%1$s, %2$s, %3$s, TO_DATE('%4$s', 'yyyy-mm-dd'), TO_DATE( '%5$s', 'yyyy-mm-dd'))",
 				reserva.getId(),
 				idFactura, 
 				reserva.getPropuesta().getId(),
@@ -106,7 +106,7 @@ public class DAOTablaReservas {
 			String[] datos = parametro.split(",");
 			sql += String.format(" AND ID_CLIENTE = %1$s", datos[0]);
 			sql += String.format(" AND RE.ID = %1$s", datos[1]);
-			
+			break; 
 		case BUSQUEDA_PROPUESTA:
 			sql += " AND ID_PROPUESTA = " + parametro;
 		default:

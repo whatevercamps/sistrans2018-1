@@ -8,11 +8,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import vos.Cliente;
+import vos.Factura;
+import vos.Reserva;
 
 
 public class DAOTablaClientes {
 	
 	public final static String USUARIO = "PARRANDEROS";
+	public static final int BUSQUEDA_POR_RESERVA = 0;
 	private ArrayList<Object> recursos;
 
 	private Connection conn;
@@ -60,9 +63,45 @@ public class DAOTablaClientes {
 	}
 
 
+	public List<Cliente> darClientesPor(int filtro, String parametro) throws SQLException, Exception {
+		List<Cliente> clientes = new ArrayList<Cliente>();
+		String sql = "SELECT RESERVAS.*, CLIENTES.* FROM CLIENTES, RESERVAS, FACTURAS WHERE CLIENTES.ID = ID_CLIENTE AND ID_FACTURA = FACTURAS.ID";
+
+		switch(filtro) {
+
+		case BUSQUEDA_POR_RESERVA:
+			sql += " AND CLIENTES.ID = " + parametro + " FETCH FIRST 1 ROWS ONLY";
+			break;
+		default:
+			break;
+		}
 
 
-	public Cliente darCliente(Long id) throws SQLException {
+		PreparedStatement st = conn.prepareStatement(sql);
+		recursos.add(st);
+		System.out.println("Filtro: " + filtro + ", paramatro: " + parametro);
+		System.out.println(sql);
+		ResultSet rs = st.executeQuery();
+
+		while(rs.next()) {
+			System.out.println("si hay " + rs.getLong("ID"));
+			Cliente act = new Cliente();
+			act.setCodigo(rs.getLong("ID"));
+			act.setNombre(rs.getString("NOMBRE"));
+			act.setApellido(rs.getString("APELLIDO"));
+			act.setTipo(rs.getInt("AFILIACION"));
+			clientes.add(act);
+
+		}
+		return clientes;
+	}
+
+	public List<Factura> darFacturasCliente(Long idCliente){
+		List<Factura> facturas = new ArrayList<Factura>();
+		return facturas;
+	}
+
+	public Cliente darCliente(Long id) throws SQLException, Exception {
 		Cliente clientePorId = null;
 
 		String sqlClientePorId = "SELECT * FROM CLIENTES WHERE ID = " + id + " FETCH FIRST 1 ROWS ONLY"; 

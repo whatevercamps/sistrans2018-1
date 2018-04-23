@@ -16,6 +16,7 @@ public class DAOTablaPropuestas {
 
 	public static final int RESERVA = 1;
 	public static final int ID_IDOPERADOR = 2;
+	public static final int PROPUESTAS_DISPONIBLES_DE_TIPO = 0;
 	private ArrayList<Object> recursos;
 
 	private Connection conn;
@@ -54,6 +55,11 @@ public class DAOTablaPropuestas {
 		case ID_IDOPERADOR:
 			String[] datos = parametro.split(",");  
 			sql += " WHERE ID_OPERADOR = " + datos[1] + " AND PROPUESTAS.ID = " + datos[0];
+			break;
+		case PROPUESTAS_DISPONIBLES_DE_TIPO:
+			sql += "SELECT * FROM PROPUESTAS LEFT OUTER JOIN RESERVAS ON PROPUESTAS.ID = RESERVAS.ID_PROPUESTA WHERE TIPO = " + parametro
+					+ " AND PROPUESTAS.ID NOT IN (SELECT ID_PROPUESTA FROM RESERVAS) FETCH FIRST 1 ROWS ONLY";
+			break;
 		default:
 			break;
 		}

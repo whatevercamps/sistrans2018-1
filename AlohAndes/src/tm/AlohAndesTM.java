@@ -17,6 +17,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Savepoint;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 
 import java.util.List;
@@ -1067,7 +1068,7 @@ public class AlohAndesTM {
 
 	public void retirarPropuesta(Long idOperador, Long idPropuesta) throws SQLException, Exception {
 		boolean conexionPropia = false; 
-		
+
 		DAOTablaPropuestas dao = new DAOTablaPropuestas();
 
 		try {
@@ -1078,7 +1079,7 @@ public class AlohAndesTM {
 				this.conn.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
 				this.savepoint = this.conn.setSavepoint();
 			}
-			
+
 			if(darPropuestasPor(DAOTablaPropuestas.ID_IDOPERADOR, idPropuesta + "," + idOperador).isEmpty()) {
 				throw new Exception("El operador con el id " + idOperador + " no cuenta con una propuesta con id " + idPropuesta);
 			}
@@ -1087,14 +1088,14 @@ public class AlohAndesTM {
 				throw new Exception("No se puede retirar la propuesta porque a�n no hay terminado la �ltima reserva vigente");
 			}
 
-			
+
 			dao.setConn(conn);
 
 			dao.retirarPropuesta(idPropuesta);
 
 			if(conexionPropia)
 				this.conn.commit();
-			
+
 		} catch (SQLException e) {
 			this.conn.rollback(this.savepoint);
 			System.err.println("SQLException:" + e.getMessage());
@@ -1338,6 +1339,7 @@ public class AlohAndesTM {
 				this.conn = darConexion(); 
 				conexionPropia = true; 
 				this.conn.setAutoCommit(false);
+				this.conn.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
 				this.savepoint = this.conn.setSavepoint();
 			}
 			dao.setConn(conn);
@@ -1374,6 +1376,118 @@ public class AlohAndesTM {
 				throw exception;
 			}
 		}
+	}
+
+
+	public String[] reqConsSiete(String tiempo, Integer unidad) throws SQLException, Exception{
+		boolean conexionPropia = false;
+		DAOTablaReservas dao = new DAOTablaReservas();
+		String[] ret =  new String[2];
+		try {
+			if (this.conn == null || this.conn.isClosed()) {
+				this.conn = darConexion(); 
+				conexionPropia = true; 
+				this.conn.setAutoCommit(false);
+				this.conn.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
+				this.savepoint = this.conn.setSavepoint();
+			}
+			
+			dao.setConn(conn);
+			int tem = tiempo.equalsIgnoreCase("day")? 1 : tiempo.equalsIgnoreCase("week") ? 2 : tiempo.equalsIgnoreCase("month") ? 3 : tiempo.equalsIgnoreCase("year") ? 4: 0;
+
+			if(tem == 0)
+				throw new Exception("El tiempo, " + tiempo +  ", no es correcto");
+
+			if(unidad <= 0)
+				throw new Exception("la unidad de tiempo, " + unidad +  ", no es un valor correcto, pendejo");
+
+			int ite = 1;
+			switch (tem) {
+			case 1:
+				ite = unidad;
+				break;
+
+			case 2:
+				ite = 7 * unidad;
+				break;
+
+			case 3: 
+				ite = 7 * 4 * unidad;
+				break;
+
+			case 4: 
+				ite = 7 * 4 * 12 * unidad;
+				break;
+			default:
+				break;
+			}
+
+			SimpleDateFormat dtf = new SimpleDateFormat("yyyy-MM-dd");
+
+
+			Calendar c = Calendar.getInstance();
+			c.setTime(new Date());
+
+			Date diaMayorDemanda = new Date();
+			int cantMaximaDemanda = 0;
+			
+			Date diaMayorIngreso = new Date();
+			Double  cantMAyorIngreso = 0.0;
+			while(ite >= 0) {
+				
+				//Mayor Demanda
+				c.add(Calendar.DATE, ite);
+				Date act = c.getTime();
+				int cantAct = dao.darCantidadReservasDia(dtf.format(act));
+				if(cantAct >= cantMaximaDemanda ) {
+					diaMayorDemanda = act;
+					cantMaximaDemanda = cantAct;
+				}
+				
+				//Mayor Ingreso
+				c.add(Calendar.DATE, ite*(-1));
+				act = c.getTime();
+				Double ingAct = dao.darIngresosTotalDia(dtf.format(act));
+				if(ingAct >= cantMAyorIngreso) {
+					diaMayorIngreso = act;
+					cantMAyorIngreso = ingAct;
+				}
+				
+				ite--;
+			}
+
+			if(conexionPropia)
+				this.conn.commit();
+			
+			ret[0] = dtf.format(diaMayorDemanda);
+			ret[1] = dtf.format(diaMayorIngreso);
+			
+		}catch (SQLException e) {
+			if(conexionPropia)
+				this.conn.rollback();
+			System.err.println("SQLException:" + e.getMessage());
+			e.printStackTrace();
+			throw e;
+		} catch (Exception e) {
+			if(conexionPropia)
+				this.conn.rollback();
+			System.err.println("GeneralException:" + e.getMessage());
+			e.printStackTrace();
+			throw e;
+		} finally {
+			try {
+
+				dao.cerrarRecursos();
+				if(this.conn!=null && conexionPropia)
+					this.conn.close();
+			} catch (SQLException exception) {
+				System.err.println("SQLException closing resources:" + exception.getMessage());
+				exception.printStackTrace();
+				throw exception;
+			}
+		}
+		
+		return ret;
 	}
 
 
@@ -1615,6 +1729,8 @@ public class AlohAndesTM {
 
 		return false;
 	}
+
+
 
 
 

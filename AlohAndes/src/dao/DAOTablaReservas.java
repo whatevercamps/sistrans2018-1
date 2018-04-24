@@ -141,4 +141,33 @@ public class DAOTablaReservas {
 		st.executeQuery();
 	}
 
+
+	public int darCantidadReservasDia(String format)  throws SQLException, Exception{
+		String sql = " SELECT COUNT(*) CONT FROM RESERVAS WHERE FECHA_INIC <= TO_DATE('" + format
+				+ "', 'yyyy-mm-dd') AND FECHA_FINA >= TO_DATE('" + format + "', 'yyyy-mm-dd')";
+		
+		System.out.println(sql);
+		PreparedStatement st = conn.prepareStatement(sql);
+		recursos.add(st);
+		ResultSet rs = st.executeQuery();
+		
+		rs.next();
+		
+		return rs.getInt("CONT");
+	}
+
+
+	public Double darIngresosTotalDia(String format) throws SQLException, Exception {
+		String sql = "SELECT SUM(PAGADO) PAG FROM FACTURAS WHERE FECHA_ULTIMO_PAGO = TO_DATE('" + format +"', 'yyyy-mm-dd')";
+		
+		System.out.println(sql);
+		PreparedStatement st = conn.prepareStatement(sql);
+		recursos.add(st);
+		ResultSet rs = st.executeQuery();
+		
+		rs.next();
+		
+		return rs.getDouble("PAG");
+	}
+
 }

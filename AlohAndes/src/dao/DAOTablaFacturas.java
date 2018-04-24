@@ -72,7 +72,7 @@ public class DAOTablaFacturas {
 		recursos.add(st);
 		ResultSet rs = st.executeQuery();
 		rs.next();
-		Long index = rs.getLong("CONT");
+		Long index = rs.getLong("CONT") + 1;
 
 		
 		String sql = "INSERT INTO FACTURAS(ID_CLIENTE, ID, FECHA_CREACION) VALUES (";

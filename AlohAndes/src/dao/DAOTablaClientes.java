@@ -65,7 +65,7 @@ public class DAOTablaClientes {
 
 	public List<Cliente> darClientesPor(int filtro, String parametro) throws SQLException, Exception {
 		List<Cliente> clientes = new ArrayList<Cliente>();
-		String sql = "SELECT RESERVAS.*, CLIENTES.* FROM CLIENTES, RESERVAS, FACTURAS WHERE CLIENTES.ID = ID_CLIENTE AND ID_FACTURA = FACTURAS.ID";
+		String sql = "SELECT CLIENTES.* FROM CLIENTES, RESERVAS, FACTURAS WHERE CLIENTES.ID = ID_CLIENTE AND ID_FACTURA = FACTURAS.ID";
 
 		switch(filtro) {
 

@@ -8,6 +8,7 @@ import javax.servlet.ServletContext;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -163,4 +164,35 @@ public class OperadorResource {
 			return Response.status( 500 ).entity( doErrorMessage( e ) ).build( );
 		}
 	}
+	
+	@PUT
+	@Path("/{id: \\d+}/propuestas/{idPropuesta: \\d+}/inhabilitar")
+	@Produces({ MediaType.APPLICATION_JSON } )
+	public Response inhabilitarPropuesta(@PathParam("id") Long idOperador, @PathParam("idPropuesta") Long idPropuesta) throws SQLException, Exception{
+		System.out.println("entreeeeee");
+		AlohAndesTM tm = new AlohAndesTM(getPath());
+		try {
+			tm.inhabilitaroferta(idPropuesta);
+			return Response.status( 200 ).build();	
+		}catch( Exception e )
+		{
+			return Response.status( 500 ).entity( doErrorMessage( e ) ).build( );
+		}
+	}
+	
+	@PUT
+	@Path("/{id: \\d+}/propuestas/{idPropuesta: \\d+}/rehabilitar")
+	@Produces({ MediaType.APPLICATION_JSON } )
+	public Response rehabilitarPropuesta(@PathParam("id") Long idOperador, @PathParam("idPropuesta") Long idPropuesta) throws SQLException, Exception{
+		System.out.println("entreeeeee");
+		AlohAndesTM tm = new AlohAndesTM(getPath());
+		try {
+			tm.rehabilitarOferta(idPropuesta, idOperador);
+			return Response.status( 200 ).build();	
+		}catch( Exception e )
+		{
+			return Response.status( 500 ).entity( doErrorMessage( e ) ).build( );
+		}
+	}
+	
 }

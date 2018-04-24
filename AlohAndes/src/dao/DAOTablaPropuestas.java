@@ -17,6 +17,8 @@ public class DAOTablaPropuestas {
 	public static final int RESERVA = 1;
 	public static final int ID_IDOPERADOR = 2;
 	public static final int PROPUESTAS_DISPONIBLES_DE_TIPO = 0;
+	public static final int PROPUESTA_DISPONIBLE_POR_ID = 3;
+	public static final int ID_OPERADOR_ID_PROPUESTA = 4;
 	private ArrayList<Object> recursos;
 
 	private Connection conn;
@@ -44,8 +46,9 @@ public class DAOTablaPropuestas {
 	public List<Propuesta> darPropuestasPor(Integer filtro, String parametro) throws SQLException, Exception{
 
 		ArrayList<Propuesta> propuestas = new ArrayList<Propuesta>();
-		String sql = "SELECT * FROM PROPUESTAS LEFT OUTER JOIN RESERVAS ON PROPUESTAS.ID = ID_PROPUESTA";
+		String sql = "SELECT * FROM PROPUESTAS LEFT OUTER JOIN RESERVAS ON PROPUESTAS.ID = RESERVAS.ID_PROPUESTA";
 
+		String[] datos;
 		switch(filtro) {
 
 		case RESERVA:
@@ -53,13 +56,34 @@ public class DAOTablaPropuestas {
 			break;
 
 		case ID_IDOPERADOR:
-			String[] datos = parametro.split(",");  
+			datos = parametro.split(",");  
 			sql += " WHERE ID_OPERADOR = " + datos[1] + " AND PROPUESTAS.ID = " + datos[0];
 			break;
-		case PROPUESTAS_DISPONIBLES_DE_TIPO:
-			sql += "SELECT * FROM PROPUESTAS LEFT OUTER JOIN RESERVAS ON PROPUESTAS.ID = RESERVAS.ID_PROPUESTA WHERE TIPO = " + parametro
-					+ " AND PROPUESTAS.ID NOT IN (SELECT ID_PROPUESTA FROM RESERVAS) FETCH FIRST 1 ROWS ONLY";
+
+		case PROPUESTA_DISPONIBLE_POR_ID:
+			datos = parametro.split(",");
+			sql += " WHERE PROPUESTAS.ID = " + datos[0]
+					+ " AND (TIPO - " + Propuesta.INHABILITADA +") < 0"
+					+ " AND PROPUESTAS.ID NOT IN (SELECT ID_PROPUESTA FROM RESERVAS WHERE (FECHA_INIC <= TO_DATE('" + datos[1]
+							+ "', 'yyyy-mm-dd') AND FECHA_FINA >= TO_DATE('" + datos[1] 
+									+ "', 'yyyy-mm-dd'))" + " OR (FECHA_FINA >= TO_DATE('" + datos[2]
+											+"', 'yyyy-mm-dd') AND FECHA_INIC <= TO_DATE('" + datos[2] 
+													+"', 'yyyy-mm-dd'))) FETCH FIRST 1 ROWS ONLY";
 			break;
+		case PROPUESTAS_DISPONIBLES_DE_TIPO:
+			datos = parametro.split(",");
+			sql += " WHERE TIPO = " + datos[0]
+					+ " AND PROPUESTAS.ID NOT IN (SELECT ID_PROPUESTA FROM RESERVAS WHERE (FECHA_INIC <= TO_DATE('" + datos[1]
+							+ "', 'yyyy-mm-dd') AND FECHA_FINA >= TO_DATE('" + datos[1] 
+									+ "', 'yyyy-mm-dd'))" + " OR (FECHA_FINA >= TO_DATE('" + datos[2]
+											+"', 'yyyy-mm-dd') AND FECHA_INIC <= TO_DATE('" + datos[2] 
+													+"', 'yyyy-mm-dd'))) FETCH FIRST 1 ROWS ONLY";
+			break;
+
+		case ID_OPERADOR_ID_PROPUESTA: 
+			datos = parametro.split(",");
+			sql+= " WHERE ID_OPERADOR = " + datos[0]
+					+ " AND PROPUESTAS.ID = " + datos[1];
 		default:
 			break;
 		}
@@ -125,18 +149,39 @@ public class DAOTablaPropuestas {
 		ResultSet rs = st.executeQuery();
 		rs.next();
 		Long[] ret = new Long[4];
-		
+
 		ret[1] = rs.getDate("FECHA_CREACION").getTime();
 		ret[2] = rs.getDate("FECHA_INIC").getTime();
 		ret[3] = rs.getDate("FECHA_FINA").getTime();
 		ret[0] = ret[1] + TimeUnit.DAYS.toMillis(rs.getInt("DIAS_CANCELACION"));
-		
+
 		return ret;
 	}
 
 
 	public void retirarPropuesta(Long idPropuesta) throws SQLException, Exception  {
 		String sql = "DELETE FROM PROPUESTAS WHERE ID = " + idPropuesta;
+		PreparedStatement st = conn.prepareStatement(sql);
+		recursos.add(st);
+		System.out.println(sql);
+		st.executeQuery();
+
+	}
+
+
+	public void bloquearOferta(Long idOferta) throws SQLException, Exception  {
+		String sql = "UPDATE PROPUESTAS SET TIPO = TIPO + " + Propuesta.INHABILITADA
+				+" WHERE ID = " + idOferta; 
+		PreparedStatement st = conn.prepareStatement(sql);
+		recursos.add(st);
+		System.out.println(sql);
+		st.executeQuery();
+	}
+
+
+	public void desbloquearOferta(Long idOferta) throws SQLException, Exception {
+		String sql = "UPDATE PROPUESTAS SET TIPO = TIPO - " + Propuesta.INHABILITADA
+				+" WHERE ID = " + idOferta; 
 		PreparedStatement st = conn.prepareStatement(sql);
 		recursos.add(st);
 		System.out.println(sql);

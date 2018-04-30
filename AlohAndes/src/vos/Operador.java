@@ -58,6 +58,10 @@ public class Operador
 	//Metodos get,set
 	
 
+	public Operador() {
+		// TODO Auto-generated constructor stub
+	}
+
 	/**
 	 * @return the minimoTiempo
 	 */

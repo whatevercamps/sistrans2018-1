@@ -67,16 +67,16 @@ public class DAOTablaFacturas {
 	}
 
 
-	public Long crearFactura(Long idCliente, String hoy)  throws SQLException, Exception{
-		PreparedStatement st = conn.prepareStatement("select count(*) cont from facturas");
+	public Long crearFactura(Long idCliente, String hoy, Long idOperador, String concepto)  throws SQLException, Exception{
+		PreparedStatement st = conn.prepareStatement("select max(id) cont from facturas");
 		recursos.add(st);
 		ResultSet rs = st.executeQuery();
 		rs.next();
 		Long index = rs.getLong("CONT") + 1;
 
 		
-		String sql = "INSERT INTO FACTURAS(ID_CLIENTE, ID, FECHA_CREACION) VALUES (";
-		sql += idCliente + ", " + index + ", TO_DATE('" + hoy + "', 'yyyy-mm-dd'))";
+		String sql = "INSERT INTO FACTURAS(ID_CLIENTE, ID, FECHA_CREACION, ID_OPERADOR, CONCEPTO) VALUES (";
+		sql += idCliente + ", " + index + ", TO_DATE('" + hoy + "', 'yyyy-mm-dd'), " + idOperador + ", '" + concepto + "')";
 		st = conn.prepareStatement(sql);
 		recursos.add(st);
 		System.out.println(sql);

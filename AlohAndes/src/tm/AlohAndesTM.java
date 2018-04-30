@@ -39,6 +39,7 @@ import vos.Apartamento;
 import vos.Cliente;
 import vos.Hostal;
 import vos.Hotel;
+import vos.Operador;
 import vos.Propuesta;
 import vos.Reserva;
 import vos.Servicio;
@@ -716,13 +717,15 @@ public class AlohAndesTM {
 				conexionPropia = true;
 				this.conn.setAutoCommit(false);
 				this.conn.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
-			}
-
-
-			if(conexionPropia)
 				this.savepoint = this.conn.setSavepoint();
-
-			Long idFactura =crearFactura(idCliente);
+			}
+			
+			List<Operador> operadores = darOperadoresPor(DAOTablaOperadores.PROPUESTA, reserva.getPropuesta().getId().toString());
+			
+			if(operadores.isEmpty())
+				throw new Exception("No se encontró el operador. Error fatal.");
+			
+			Long idFactura =crearFactura(idCliente, operadores.get(0).getId(), reserva.getPropuesta().getNombre());
 
 			crearReserva(idFactura, idCliente, reserva);
 
@@ -816,7 +819,7 @@ public class AlohAndesTM {
 		}
 	}
 
-	public Long crearFactura(Long idCliente) throws SQLException, Exception{
+	public Long crearFactura(Long idCliente, Long idOperador, String concepto) throws SQLException, Exception{
 		boolean conexionPropia = false; 
 		Long index = null;
 		DAOTablaFacturas dao = new DAOTablaFacturas();
@@ -836,7 +839,7 @@ public class AlohAndesTM {
 			SimpleDateFormat dtf = new SimpleDateFormat("yyyy-MM-dd");
 			Date hoy = new Date();
 
-			index = dao.crearFactura(idCliente, dtf.format(hoy));
+			index = dao.crearFactura(idCliente, dtf.format(hoy), idOperador, concepto);
 
 		} catch (SQLException e) {
 			this.conn.rollback(savepoint);
@@ -1133,7 +1136,7 @@ public class AlohAndesTM {
 
 			this.savepoint = this.conn.setSavepoint();
 
-			Long idFactura = crearFactura(idCliente);
+			Long idFactura = crearFactura(idCliente, new Long(0), "Reserva Colectiva");
 
 			if(reservas.isEmpty())
 				throw new Exception("La lista de reservas está vacía");
@@ -1331,6 +1334,48 @@ public class AlohAndesTM {
 		return clientes; 
 	}
 
+	public List<Operador> darOperadoresPor(int filtro, String parametro) throws SQLException, Exception {
+		boolean conexionPropia = false;
+		List<Operador> operadores = new ArrayList<Operador>();
+		DAOTablaOperadores dao = new DAOTablaOperadores();
+		
+		try {
+			if (this.conn == null || this.conn.isClosed()) {
+				this.conn = darConexion(); 
+				conexionPropia = true; 
+				this.conn.setAutoCommit(false);
+				this.savepoint = this.conn.setSavepoint();
+			}
+			dao.setConn(conn);
+			operadores = dao.darOperadoresPor(filtro, parametro);
+
+			for(Operador p : operadores) {
+				//agregar propuestas ( luego lo hago, igual no es necesario por ahora)
+			}
+
+		}catch (SQLException e) {
+			System.err.println("SQLException:" + e.getMessage());
+			e.printStackTrace();
+			throw e;
+		} catch (Exception e) {
+			System.err.println("GeneralException:" + e.getMessage());
+			e.printStackTrace();
+			throw e;
+		} finally {
+			try {
+
+				dao.cerrarRecursos();
+				if(this.conn!=null && conexionPropia)
+					this.conn.close();
+			} catch (SQLException exception) {
+				System.err.println("SQLException closing resources:" + exception.getMessage());
+				exception.printStackTrace();
+				throw exception;
+			}
+		}
+		
+		return operadores;
+	}
 	public void rehabilitarOferta(Long idOferta, Long idOperador)throws SQLException, Exception{
 		boolean conexionPropia = false;
 		DAOTablaPropuestas dao = new DAOTablaPropuestas(); 

@@ -14,6 +14,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Savepoint;
 import java.util.ArrayList;
@@ -35,6 +36,8 @@ import dao.DAOTablaReservas;
 import dao.DAOTablaServicios;
 import dao.DAOTablaVecinos;
 import dao.DAOTablaViviendasUniversitarias;
+import rest.ConsultasRest;
+import rest.ConsultasRest.Respuesta;
 import vos.Apartamento;
 import vos.Cliente;
 import vos.Hostal;
@@ -1421,6 +1424,64 @@ public class AlohAndesTM {
 				throw exception;
 			}
 		}
+	}
+	
+	public List<Respuesta> reqConsUno() throws SQLException, Exception {
+		boolean conexionPropia = false;
+		DAOTablaFacturas dao = new DAOTablaFacturas();
+		ConsultasRest cs = new ConsultasRest();
+		List<Respuesta> respuestas = new ArrayList<Respuesta>();
+		
+		try {
+			if (this.conn == null || this.conn.isClosed()) {
+				this.conn = darConexion(); 
+				conexionPropia = true; 
+				this.conn.setAutoCommit(false);
+				this.conn.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
+				this.savepoint = this.conn.setSavepoint();
+			}
+			
+			dao.setConn(conn);
+			
+			ResultSet rs = dao.reqCons1();
+			
+			while(rs.next()) {
+				String nombre = "Operador " + rs.getInt("ID1");
+				Respuesta act = cs.new Respuesta(nombre);
+				Double s1 = rs.getDouble("SUM1");
+				Double s2 = rs.getDouble("SUM2");
+				act.agregarDato("Año actual", "" + (s1 == null ? 0 : s1));
+				act.agregarDato("Año pasado", "" + (s2 == null ? 0 : s2));
+				
+				respuestas.add(act);
+			}
+						
+		}catch (SQLException e) {
+			if(conexionPropia)
+				this.conn.rollback();
+			System.err.println("SQLException:" + e.getMessage());
+			e.printStackTrace();
+			throw e;
+		} catch (Exception e) {
+			if(conexionPropia)
+				this.conn.rollback();
+			System.err.println("GeneralException:" + e.getMessage());
+			e.printStackTrace();
+			throw e;
+		} finally {
+			try {
+				dao.cerrarRecursos();
+				if(this.conn!=null && conexionPropia)
+					this.conn.close();
+			} catch (SQLException exception) {
+				System.err.println("SQLException closing resources:" + exception.getMessage());
+				exception.printStackTrace();
+				throw exception;
+			}
+		}
+		
+		return respuestas;
+		
 	}
 
 

@@ -6,9 +6,11 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import rest.ConsultasRest.Respuesta;
 import vos.Apartamento;
 import vos.Reserva;
 
@@ -82,6 +84,31 @@ public class DAOTablaFacturas {
 		System.out.println(sql);
 		st.executeQuery();
 		return index;
+		
+	}
+	
+	public ResultSet reqCons1() throws SQLException, Exception{
+		
+		Date hoy = new Date();
+		
+		Calendar c = Calendar.getInstance();
+		c.setTime(hoy);
+		
+
+		int anio = c.get(Calendar.YEAR);
+		int anioPasado = c.get(Calendar.YEAR) - 1;
+		
+		String sql = String.format("SELECT OP.ID ID1, SUM(TOTA.PAG1) SUM1, SUM(TOTA.PAG2) SUM2 "
+				+ "FROM OPERADORES OP LEFT OUTER JOIN (SELECT FA1.ID_OPERADOR ID1, FA1.PAGADO PAG1, FA2.PAGADO PAG2 "
+				+ "FROM (SELECT * FROM FACTURAS WHERE EXTRACT (YEAR FROM FECHA_ULTIMO_PAGO) = %1$s) FA1 "
+				+ "FULL OUTER JOIN (SELECT * FROM FACTURAS WHERE EXTRACT (YEAR FROM FECHA_ULTIMO_PAGO) = %2$s) FA2 "
+				+ "ON FA1.ID_OPERADOR = FA2.ID_OPERADOR) TOTA ON OP.ID = TOTA.ID1 GROUP BY OP.ID", anio, anioPasado);
+		
+		PreparedStatement st = conn.prepareStatement(sql);
+		recursos.add(st);
+		System.out.println(sql);
+		ResultSet rs = st.executeQuery();
+		return rs;
 		
 	}
 

@@ -19,6 +19,8 @@ import javax.ws.rs.core.Response;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.codehaus.jackson.annotate.JsonProperty;
+
 import dao.DAOTablaReservas;
 import tm.AlohAndesTM;
 import vos.Cliente;
@@ -33,7 +35,40 @@ import vos.Reserva;
  */
 
 @Path("consultAndes")
-public class consultasRest {
+public class ConsultasRest {
+
+	public class Respuesta{
+		
+		public class Dato{
+			@JsonProperty(value="nombre")
+			protected String nombre;
+			
+			@JsonProperty(value="valor")
+			protected String valor;
+			
+			public Dato(String pNombre, String pValor) {
+				this.nombre = pNombre;
+				this.valor = pValor;
+			}
+		}
+		
+		
+		@JsonProperty(value="nombre")
+		protected String nombre;
+		
+
+		@JsonProperty(value="datos")
+		protected List<Dato> datos;
+		
+		public Respuesta(String nombre) {
+			this.nombre = nombre; 
+			this.datos = new ArrayList<Dato>();
+		}
+		
+		public void agregarDato(String nombre, String valor) {
+			this.datos.add(new Dato(nombre, valor));
+		}
+	}
 
 
 	@Context
@@ -49,9 +84,25 @@ public class consultasRest {
 
 
 	@GET
+	@Path("RFC1")
+	@Produces({ MediaType.APPLICATION_JSON } )
+	public Response reqCons1() throws SQLException, Exception{
+		AlohAndesTM tm = new AlohAndesTM(getPath());
+		
+		try {
+			List<Respuesta> rta = tm.reqConsUno();
+			return Response.status( 200 ).entity( rta ).build();	
+		}catch( Exception e )
+		{
+			return Response.status( 500 ).entity( doErrorMessage( e ) ).build( );
+		}
+	}
+
+
+	@GET
 	@Path("RFC7")
 	@Produces({ MediaType.APPLICATION_JSON } )
-	public Response darReservas(@QueryParam("tiempo") String tiempo, @QueryParam("unidad") Integer unidad) throws SQLException, Exception{
+	public Response reqCons7(@QueryParam("tiempo") String tiempo, @QueryParam("unidad") Integer unidad) throws SQLException, Exception{
 		AlohAndesTM tm = new AlohAndesTM(getPath());
 
 		try {

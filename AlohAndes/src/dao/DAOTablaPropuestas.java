@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+
 import vos.Cliente;
 import vos.Propuesta;
 
@@ -187,6 +188,39 @@ public class DAOTablaPropuestas {
 		System.out.println(sql);
 		st.executeQuery();
 		
+	}
+	
+	public ResultSet reqCons2()  throws SQLException, Exception {
+		String sql = "SELECT po.id, po.nombre, po.tipo, po.costo, po.DIAS_CANCELACION ,COUNT(*) as cont FROM " + 
+				"RESERVAS Re, propuestas po " + 
+				"where Re.ID_PROPUESTA=po.ID " + 
+				"group by po.id, po.nombre, po.tipo, po.costo, po.DIAS_CANCELACION " + 
+				"order BY cont desc fetch first 20 rows only";
+		
+		PreparedStatement st = conn.prepareStatement(sql);
+		recursos.add(st);
+		System.out.println(sql);
+		ResultSet rs = st.executeQuery();	
+		return rs;
+	}
+
+
+	public ResultSet reqCons3() throws SQLException, Exception{
+		String sql = "SELECT AA1.ID1 ID_ALOJAMIENTO, (100/AA1.CONTFIN)*AA1.CONTFIN - (100/AA1.CONTFIN)*AA2.CONTFIN TASA FROM " + 
+				"(SELECT PR.ID ID1, COALESCE(PR2.CONT, 0) CONTFIN FROM PROPUESTAS PR LEFT OUTER JOIN " + 
+				"(SELECT ID_OPERADOR, TIPO, COUNT(PR.ID) CONT FROM PROPUESTAS PR GROUP BY ID_OPERADOR, TIPO) PR2 " + 
+				"ON PR.TIPO = PR2.TIPO AND PR.ID_OPERADOR = PR2.ID_OPERADOR) AA1, " + 
+				"(SELECT PR.ID ID1, COALESCE(PR2.CONT, 0) CONTFIN FROM PROPUESTAS PR LEFT OUTER JOIN " + 
+				"(SELECT ID_OPERADOR, TIPO, COUNT(PR.ID) CONT FROM PROPUESTAS PR, RESERVAS "+ 
+				"WHERE ID_PROPUESTA = PR.ID GROUP BY ID_OPERADOR, TIPO) PR2 " + 
+				"ON PR.TIPO = PR2.TIPO AND PR.ID_OPERADOR = PR2.ID_OPERADOR) AA2 " + 
+				"WHERE AA1.ID1 = AA2.ID1";
+		
+		PreparedStatement st = conn.prepareStatement(sql);
+		recursos.add(st);
+		System.out.println(sql);
+		ResultSet rs = st.executeQuery();	
+		return rs;
 	}
 
 }

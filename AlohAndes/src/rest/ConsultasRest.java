@@ -24,6 +24,7 @@ import org.codehaus.jackson.annotate.JsonProperty;
 import dao.DAOTablaReservas;
 import tm.AlohAndesTM;
 import vos.Cliente;
+import vos.Propuesta;
 import vos.Reserva;
 
 
@@ -69,7 +70,21 @@ public class ConsultasRest {
 			this.datos.add(new Dato(nombre, valor));
 		}
 	}
-
+	
+	public class RespuestaConsulta2 {
+		
+		@JsonProperty(value="propuesta")
+		protected Propuesta propuesta;
+		
+		@JsonProperty(value="cantidad")
+		protected Integer cantidad;
+		
+		public RespuestaConsulta2(Propuesta propuesta, Integer cantidad) {
+			this.propuesta = propuesta;
+			this.cantidad = cantidad;
+		}
+	}
+	
 
 	@Context
 	private ServletContext context;
@@ -97,7 +112,36 @@ public class ConsultasRest {
 			return Response.status( 500 ).entity( doErrorMessage( e ) ).build( );
 		}
 	}
-
+	
+	@GET
+	@Path("RFC2")
+	@Produces({ MediaType.APPLICATION_JSON } )
+	public Response reqCons2() throws SQLException, Exception{
+		AlohAndesTM tm = new AlohAndesTM(getPath());
+		
+		try {
+			List<RespuestaConsulta2> rta = tm.reqConsDos(this);
+			return Response.status( 200 ).entity( rta ).build();	
+		}catch( Exception e )
+		{
+			return Response.status( 500 ).entity( doErrorMessage( e ) ).build( );
+		}
+	}
+	
+	@GET
+	@Path("RFC3")
+	@Produces({ MediaType.APPLICATION_JSON } )
+	public Response reqCons3() throws SQLException, Exception{
+		AlohAndesTM tm = new AlohAndesTM(getPath());
+		
+		try {
+			Respuesta rta = tm.reqConsTres(this);
+			return Response.status( 200 ).entity( rta ).build();	
+		}catch( Exception e )
+		{
+			return Response.status( 500 ).entity( doErrorMessage( e ) ).build( );
+		}
+	}
 
 	@GET
 	@Path("RFC7")

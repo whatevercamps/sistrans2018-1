@@ -38,6 +38,7 @@ import dao.DAOTablaVecinos;
 import dao.DAOTablaViviendasUniversitarias;
 import rest.ConsultasRest;
 import rest.ConsultasRest.Respuesta;
+import rest.ConsultasRest.RespuestaConsulta2;
 import vos.Apartamento;
 import vos.Cliente;
 import vos.Hostal;
@@ -1484,6 +1485,120 @@ public class AlohAndesTM {
 		
 	}
 
+	public List<RespuestaConsulta2> reqConsDos(ConsultasRest cs) throws SQLException, Exception {
+		boolean conexionPropia = false;
+		DAOTablaPropuestas dao = new DAOTablaPropuestas();
+		List<RespuestaConsulta2> respuestas = new ArrayList<RespuestaConsulta2>();
+		
+		try {
+			if (this.conn == null || this.conn.isClosed()) {
+				this.conn = darConexion(); 
+				conexionPropia = true; 
+				this.conn.setAutoCommit(false);
+				this.conn.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
+				this.savepoint = this.conn.setSavepoint();
+			}
+			
+			dao.setConn(conn);
+			
+			ResultSet rs = dao.reqCons2();
+			
+			while(rs.next()) {
+				
+				
+				
+				Propuesta pr = new Propuesta();
+				
+				pr.setCosto(rs.getDouble("COSTO"));
+				pr.setDiasCancelacion(rs.getInt("DIAS_CANCELACION"));
+				pr.setId(rs.getLong("ID"));
+				pr.setNombre(rs.getString("NOMBRE"));
+				pr.setTipo(rs.getInt("TIPO"));
+				
+			
+				respuestas.add(cs.new RespuestaConsulta2(pr, rs.getInt("CONT")));
+			}
+						
+		}catch (SQLException e) {
+			if(conexionPropia)
+				this.conn.rollback();
+			System.err.println("SQLException:" + e.getMessage());
+			e.printStackTrace();
+			throw e;
+		} catch (Exception e) {
+			if(conexionPropia)
+				this.conn.rollback();
+			System.err.println("GeneralException:" + e.getMessage());
+			e.printStackTrace();
+			throw e;
+		} finally {
+			try {
+				dao.cerrarRecursos();
+				if(this.conn!=null && conexionPropia)
+					this.conn.close();
+			} catch (SQLException exception) {
+				System.err.println("SQLException closing resources:" + exception.getMessage());
+				exception.printStackTrace();
+				throw exception;
+			}
+		}
+		
+		return respuestas;
+	}	
+	
+
+	public Respuesta reqConsTres(ConsultasRest consultasRest) throws SQLException, Exception{
+		boolean conexionPropia = false;
+		DAOTablaPropuestas dao = new DAOTablaPropuestas();
+		ConsultasRest cs = new ConsultasRest();
+		Respuesta respuesta = consultasRest.new Respuesta("Tasas");
+		
+		try {
+			if (this.conn == null || this.conn.isClosed()) {
+				this.conn = darConexion(); 
+				conexionPropia = true; 
+				this.conn.setAutoCommit(false);
+				this.conn.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
+				this.savepoint = this.conn.setSavepoint();
+			}
+			
+			dao.setConn(conn);
+			
+			ResultSet rs = dao.reqCons3();
+			
+			while(rs.next()) {
+				
+				respuesta.agregarDato("Tasa de alojamiento de propuesta con id " + rs.getLong("ID_ALOJAMIENTO"), 
+				rs.getDouble("TASA") + " por ciento");
+				
+			}
+						
+		}catch (SQLException e) {
+			if(conexionPropia)
+				this.conn.rollback();
+			System.err.println("SQLException:" + e.getMessage());
+			e.printStackTrace();
+			throw e;
+		} catch (Exception e) {
+			if(conexionPropia)
+				this.conn.rollback();
+			System.err.println("GeneralException:" + e.getMessage());
+			e.printStackTrace();
+			throw e;
+		} finally {
+			try {
+				dao.cerrarRecursos();
+				if(this.conn!=null && conexionPropia)
+					this.conn.close();
+			} catch (SQLException exception) {
+				System.err.println("SQLException closing resources:" + exception.getMessage());
+				exception.printStackTrace();
+				throw exception;
+			}
+		}
+		
+		return respuesta;
+	}
 
 	public String[] reqConsSiete(String tiempo, Integer unidad) throws SQLException, Exception{
 		boolean conexionPropia = false;
@@ -1835,7 +1950,6 @@ public class AlohAndesTM {
 
 		return false;
 	}
-
 
 
 

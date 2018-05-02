@@ -18,13 +18,13 @@ import org.codehaus.jackson.annotate.JsonProperty;
 
 public class Propuesta
 {
-	public static int HABITACION_SENCILLA=1;
-	public static int HABITACION_COMPARTIDA=2;
-	public static int HABITACION_SUITE_SENCILLA=3;
-	public static int HABITACION_SUITE_COMPARTIDA=4;
-	public static int HABITACION_SEMI_SUITE_SENCILLA=5;
-	public static int HABITACION_SEMI_SUITE_COMPARTIDA=6;
-	public static int INHABILITADA = 1000;
+	public final static int HABITACION_SENCILLA=1;
+	public final static int HABITACION_COMPARTIDA=2;
+	public final static int HABITACION_SUITE_SENCILLA=3;
+	public final static int HABITACION_SUITE_COMPARTIDA=4;
+	public final static int HABITACION_SEMI_SUITE_SENCILLA=5;
+	public final static int HABITACION_SEMI_SUITE_COMPARTIDA=6;
+	public final static int INHABILITADA = 1000;
 
 	/**
 	 * Identificador de una propuesta

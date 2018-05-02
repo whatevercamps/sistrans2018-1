@@ -142,7 +142,35 @@ public class ConsultasRest {
 			return Response.status( 500 ).entity( doErrorMessage( e ) ).build( );
 		}
 	}
+	
+	@GET
+	@Path("RFC5/{id: \\d+}")
+	@Produces({ MediaType.APPLICATION_JSON } )
+	public Response reqCons5(@PathParam("id") Integer tipo) throws SQLException, Exception{
+		AlohAndesTM tm = new AlohAndesTM(getPath());
+		try {
+			List<Respuesta> rta = tm.reqConsCinco(this, tipo);
+			return Response.status( 200 ).entity( rta ).build();	
+		}catch( Exception e )
+		{
+			return Response.status( 500 ).entity( doErrorMessage( e ) ).build( );
+		}
+	}
 
+	@GET
+	@Path("RFC6/{id: \\d+}")
+	@Produces({ MediaType.APPLICATION_JSON } )
+	public Response reqCons6(@PathParam("id") Long idCliente) throws SQLException, Exception{
+		AlohAndesTM tm = new AlohAndesTM(getPath());
+		try {
+			List<Respuesta> rta = tm.reqConsSeis(this, idCliente);
+			return Response.status( 200 ).entity( rta ).build();	
+		}catch( Exception e )
+		{
+			return Response.status( 500 ).entity( doErrorMessage( e ) ).build( );
+		}
+	}
+	
 	@GET
 	@Path("RFC7")
 	@Produces({ MediaType.APPLICATION_JSON } )
@@ -152,6 +180,22 @@ public class ConsultasRest {
 		try {
 			String[] datos = tm.reqConsSiete(tiempo, unidad);
 			return Response.status( 200 ).entity( "{ \"FECHA_MAYOR_DEMANDA\": \" " + datos[0] +" \", \n \"FECHA_MAYOR_INGRESO\": \" " + datos[1] + " \"}" ).build();	
+		}catch( Exception e )
+		{
+			return Response.status( 500 ).entity( doErrorMessage( e ) ).build( );
+		}
+	}
+	
+	
+	@GET
+	@Path("RFC7MEJORADO")
+	@Produces({ MediaType.APPLICATION_JSON } )
+	public Response reqConsMejorado7(@QueryParam("tiempo") String tiempo) throws SQLException, Exception{
+		AlohAndesTM tm = new AlohAndesTM(getPath());
+
+		try {
+			Respuesta rta = tm.reqConsSieteMejorado(this, tiempo);
+			return Response.status( 200 ).entity(rta).build();	
 		}catch( Exception e )
 		{
 			return Response.status( 500 ).entity( doErrorMessage( e ) ).build( );

@@ -223,4 +223,19 @@ public class DAOTablaPropuestas {
 		return rs;
 	}
 
+
+	public ResultSet reqCons5(int tipo) throws SQLException, Exception {
+		String sql = "SELECT FA.*, A1.* FROM FACTURAS FA LEFT OUTER JOIN "
+				+ "(SELECT RE.ID ID_RES, PR.ID ID_PR, ID_FACTURA, FECHA_INIC, "
+				+ "FECHA_FINA, TIPO, COSTO, DIAS_CANCELACION, NOMBRE FROM RESERVAS RE, "
+				+ "PROPUESTAS PR WHERE RE.ID_PROPUESTA = PR.ID) A1 ON A1.ID_FACTURA = FA.ID "
+				+ "WHERE TIPO = " + tipo;
+		
+		PreparedStatement st = conn.prepareStatement(sql);
+		recursos.add(st);
+		System.out.println(sql);
+		ResultSet rs = st.executeQuery();
+		return rs;
+	}
+
 }

@@ -97,7 +97,7 @@ public class DAOTablaReservas {
 		case BUSQUEDA_CLIENTE:
 			sql += String.format(" AND ID_CLIENTE = %1$s", parametro);
 			break;
-		
+
 		case BUSQUEDA_ID:
 			sql += String.format(" AND RE.ID = %1$s", parametro);
 			break;
@@ -145,29 +145,53 @@ public class DAOTablaReservas {
 	public int darCantidadReservasDia(String format)  throws SQLException, Exception{
 		String sql = " SELECT COUNT(*) CONT FROM RESERVAS WHERE FECHA_INIC <= TO_DATE('" + format
 				+ "', 'yyyy-mm-dd') AND FECHA_FINA >= TO_DATE('" + format + "', 'yyyy-mm-dd')";
-		
+
 		System.out.println(sql);
 		PreparedStatement st = conn.prepareStatement(sql);
 		recursos.add(st);
 		ResultSet rs = st.executeQuery();
-		
+
 		rs.next();
-		
+
 		return rs.getInt("CONT");
 	}
 
 
 	public Double darIngresosTotalDia(String format) throws SQLException, Exception {
 		String sql = "SELECT SUM(PAGADO) PAG FROM FACTURAS WHERE FECHA_ULTIMO_PAGO = TO_DATE('" + format +"', 'yyyy-mm-dd')";
-		
+
 		System.out.println(sql);
 		PreparedStatement st = conn.prepareStatement(sql);
 		recursos.add(st);
 		ResultSet rs = st.executeQuery();
-		
+
 		rs.next();
-		
+
 		return rs.getDouble("PAG");
+	}
+
+
+	public ResultSet reqConsSiete(int tem) throws SQLException, Exception{
+
+		String temp = tem == 1 ? "DD" : tem == 2 ? "WW" : tem == 3 ? "MM" : "YY";
+
+		String sql = "select  PAGADO, "
+				+ "To_Number(to_char((SELECT FECHA_CREACION FROM FACTURAS ORDER BY FECHA_CREACION FETCH FIRST 1 ROWS ONLY),'"
+				+ temp 
+				+ "')) - "
+				+ "To_number(to_char(FECHA_CREACION,'"
+				+ temp
+				+ "')) + 1 HOLA "
+				+ "from FACTURAS";
+
+
+
+		System.out.println(sql);
+		PreparedStatement st = conn.prepareStatement(sql);
+		recursos.add(st);
+		ResultSet rs = st.executeQuery();
+
+		return rs;
 	}
 
 }

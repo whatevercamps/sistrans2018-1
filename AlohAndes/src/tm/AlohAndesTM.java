@@ -723,12 +723,12 @@ public class AlohAndesTM {
 				this.conn.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
 				this.savepoint = this.conn.setSavepoint();
 			}
-			
+
 			List<Operador> operadores = darOperadoresPor(DAOTablaOperadores.PROPUESTA, reserva.getPropuesta().getId().toString());
-			
+
 			if(operadores.isEmpty())
 				throw new Exception("No se encontró el operador. Error fatal.");
-			
+
 			Long idFactura =crearFactura(idCliente, operadores.get(0).getId(), reserva.getPropuesta().getNombre());
 
 			crearReserva(idFactura, idCliente, reserva);
@@ -1342,7 +1342,7 @@ public class AlohAndesTM {
 		boolean conexionPropia = false;
 		List<Operador> operadores = new ArrayList<Operador>();
 		DAOTablaOperadores dao = new DAOTablaOperadores();
-		
+
 		try {
 			if (this.conn == null || this.conn.isClosed()) {
 				this.conn = darConexion(); 
@@ -1377,7 +1377,7 @@ public class AlohAndesTM {
 				throw exception;
 			}
 		}
-		
+
 		return operadores;
 	}
 	public void rehabilitarOferta(Long idOferta, Long idOperador)throws SQLException, Exception{
@@ -1426,13 +1426,13 @@ public class AlohAndesTM {
 			}
 		}
 	}
-	
+
 	public List<Respuesta> reqConsUno() throws SQLException, Exception {
 		boolean conexionPropia = false;
 		DAOTablaFacturas dao = new DAOTablaFacturas();
 		ConsultasRest cs = new ConsultasRest();
 		List<Respuesta> respuestas = new ArrayList<Respuesta>();
-		
+
 		try {
 			if (this.conn == null || this.conn.isClosed()) {
 				this.conn = darConexion(); 
@@ -1441,11 +1441,11 @@ public class AlohAndesTM {
 				this.conn.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
 				this.savepoint = this.conn.setSavepoint();
 			}
-			
+
 			dao.setConn(conn);
-			
+
 			ResultSet rs = dao.reqCons1();
-			
+
 			while(rs.next()) {
 				String nombre = "Operador " + rs.getInt("ID1");
 				Respuesta act = cs.new Respuesta(nombre);
@@ -1453,10 +1453,10 @@ public class AlohAndesTM {
 				Double s2 = rs.getDouble("SUM2");
 				act.agregarDato("Año actual", "" + (s1 == null ? 0 : s1));
 				act.agregarDato("Año pasado", "" + (s2 == null ? 0 : s2));
-				
+
 				respuestas.add(act);
 			}
-						
+
 		}catch (SQLException e) {
 			if(conexionPropia)
 				this.conn.rollback();
@@ -1480,16 +1480,16 @@ public class AlohAndesTM {
 				throw exception;
 			}
 		}
-		
+
 		return respuestas;
-		
+
 	}
 
 	public List<RespuestaConsulta2> reqConsDos(ConsultasRest cs) throws SQLException, Exception {
 		boolean conexionPropia = false;
 		DAOTablaPropuestas dao = new DAOTablaPropuestas();
 		List<RespuestaConsulta2> respuestas = new ArrayList<RespuestaConsulta2>();
-		
+
 		try {
 			if (this.conn == null || this.conn.isClosed()) {
 				this.conn = darConexion(); 
@@ -1498,27 +1498,27 @@ public class AlohAndesTM {
 				this.conn.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
 				this.savepoint = this.conn.setSavepoint();
 			}
-			
+
 			dao.setConn(conn);
-			
+
 			ResultSet rs = dao.reqCons2();
-			
+
 			while(rs.next()) {
-				
-				
-				
+
+
+
 				Propuesta pr = new Propuesta();
-				
+
 				pr.setCosto(rs.getDouble("COSTO"));
 				pr.setDiasCancelacion(rs.getInt("DIAS_CANCELACION"));
 				pr.setId(rs.getLong("ID"));
 				pr.setNombre(rs.getString("NOMBRE"));
 				pr.setTipo(rs.getInt("TIPO"));
-				
-			
+
+
 				respuestas.add(cs.new RespuestaConsulta2(pr, rs.getInt("CONT")));
 			}
-						
+
 		}catch (SQLException e) {
 			if(conexionPropia)
 				this.conn.rollback();
@@ -1542,17 +1542,17 @@ public class AlohAndesTM {
 				throw exception;
 			}
 		}
-		
+
 		return respuestas;
 	}	
-	
+
 
 	public Respuesta reqConsTres(ConsultasRest consultasRest) throws SQLException, Exception{
 		boolean conexionPropia = false;
 		DAOTablaPropuestas dao = new DAOTablaPropuestas();
 		ConsultasRest cs = new ConsultasRest();
 		Respuesta respuesta = consultasRest.new Respuesta("Tasas");
-		
+
 		try {
 			if (this.conn == null || this.conn.isClosed()) {
 				this.conn = darConexion(); 
@@ -1561,18 +1561,18 @@ public class AlohAndesTM {
 				this.conn.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
 				this.savepoint = this.conn.setSavepoint();
 			}
-			
+
 			dao.setConn(conn);
-			
+
 			ResultSet rs = dao.reqCons3();
-			
+
 			while(rs.next()) {
-				
+
 				respuesta.agregarDato("Tasa de alojamiento de propuesta con id " + rs.getLong("ID_ALOJAMIENTO"), 
-				rs.getDouble("TASA") + " por ciento");
-				
+						rs.getDouble("TASA") + " por ciento");
+
 			}
-						
+
 		}catch (SQLException e) {
 			if(conexionPropia)
 				this.conn.rollback();
@@ -1596,8 +1596,224 @@ public class AlohAndesTM {
 				throw exception;
 			}
 		}
-		
+
 		return respuesta;
+	}
+	
+	public List<Respuesta> reqConsCinco(ConsultasRest cs, int tipo) throws SQLException, Exception{
+
+		boolean conexionPropia = false;
+		DAOTablaPropuestas dao = new DAOTablaPropuestas();
+		List<Respuesta> respuestas = new ArrayList<Respuesta>();
+
+		try {
+			if (this.conn == null || this.conn.isClosed()) {
+				this.conn = darConexion(); 
+				conexionPropia = true; 
+				this.conn.setAutoCommit(false);
+				this.conn.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
+				this.savepoint = this.conn.setSavepoint();
+			}
+
+			dao.setConn(conn);
+
+			ResultSet rs = dao.reqCons5(tipo);
+
+			while(rs.next()) {
+				Respuesta rta;
+				Long idReserva = rs.getLong("ID_RES");
+				Date FechaUltimoPago = rs.getDate("FECHA_ULTIMO_PAGO");
+				SimpleDateFormat dtf = new SimpleDateFormat("yyyy-MM-dd");
+				System.out.println("idReserva: " + idReserva);
+				
+				if(idReserva == 0) {
+					rta = cs.new Respuesta("Factura del " + dtf.format(rs.getDate("FECHA_CREACION")));
+					rta.agregarDato("idCliente", "" + rs.getLong("ID_CLIENTE"));
+					rta.agregarDato("Fecha de pago", dtf.format(FechaUltimoPago));
+					rta.agregarDato("Pagado", "" + rs.getDouble("PAGADO"));
+					rta.agregarDato("Concepto", rs.getString("CONCEPTO"));
+					rta.agregarDato("Operador que facturó", "" + rs.getLong("ID_OPERADOR"));
+					respuestas.add(rta);
+				}
+
+				else{
+					Date inicio = rs.getDate("FECHA_INIC");
+					Date fin = rs.getDate("FECHA_FINA");
+					rta = cs.new Respuesta("Reserva para el día " + dtf.format(inicio));
+					rta.agregarDato("idCliente", "" + rs.getLong("ID_CLIENTE"));
+					long diff = Math.abs(fin.getTime() - inicio.getTime());
+					Long diffDays = diff / (24 * 60 * 60 * 1000);
+					rta.agregarDato("Fecha de terminación de reserva", dtf.format(fin));
+					rta.agregarDato("numero días reserva", diffDays.toString());
+
+					int tipoN = rs.getInt("TIPO");
+					String sTipo = "";
+					switch (tipoN) {
+					case Propuesta.HABITACION_SENCILLA:
+						sTipo = "habitación sencilla";
+						break;
+					case Propuesta.HABITACION_COMPARTIDA:
+						sTipo = "Habitación compartida";
+						break;
+					case Propuesta.HABITACION_SUITE_SENCILLA:
+						sTipo = "Habitación suite sencilla";
+						break;
+					case Propuesta.HABITACION_SUITE_COMPARTIDA:
+						sTipo = "Habitación suite compartida";
+						break;
+					case Propuesta.HABITACION_SEMI_SUITE_SENCILLA:
+						sTipo = "Habitación semi suite sencilla";
+						break;
+					case Propuesta.HABITACION_SEMI_SUITE_COMPARTIDA:
+						sTipo = "Habitación semi suite compartida";
+						break;
+					default:
+						sTipo = "Otro";
+						break;
+					}
+					rta.agregarDato("Nombre propuesta", rs.getString("NOMBRE"));
+					rta.agregarDato("Tipo Alojamiento", sTipo);
+					rta.agregarDato("Costo", ""+rs.getDouble("COSTO"));
+					rta.agregarDato("Días permitidos de cancelación", ""+rs.getInt("DIAS_CANCELACION"));
+					respuestas.add(rta);
+
+				}
+
+			}
+
+		}catch (SQLException e) {
+			if(conexionPropia)
+				this.conn.rollback();
+			System.err.println("SQLException:" + e.getMessage());
+			e.printStackTrace();
+			throw e;
+		} catch (Exception e) {
+			if(conexionPropia)
+				this.conn.rollback();
+			System.err.println("GeneralException:" + e.getMessage());
+			e.printStackTrace();
+			throw e;
+		} finally {
+			try {
+				dao.cerrarRecursos();
+				if(this.conn!=null && conexionPropia)
+					this.conn.close();
+			} catch (SQLException exception) {
+				System.err.println("SQLException closing resources:" + exception.getMessage());
+				exception.printStackTrace();
+				throw exception;
+			}
+		}
+
+		return respuestas;
+	}
+
+
+	public List<Respuesta> reqConsSeis(ConsultasRest cs, Long idCliente) throws SQLException, Exception{
+
+		boolean conexionPropia = false;
+		DAOTablaClientes dao = new DAOTablaClientes();
+		List<Respuesta> respuestas = new ArrayList<Respuesta>();
+
+		try {
+			if (this.conn == null || this.conn.isClosed()) {
+				this.conn = darConexion(); 
+				conexionPropia = true; 
+				this.conn.setAutoCommit(false);
+				this.conn.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
+				this.savepoint = this.conn.setSavepoint();
+			}
+
+			dao.setConn(conn);
+
+			ResultSet rs = dao.reqCons6(idCliente);
+
+			while(rs.next()) {
+				Respuesta rta;
+				Long idReserva = rs.getLong("ID_RES");
+				Date FechaUltimoPago = rs.getDate("FECHA_ULTIMO_PAGO");
+				SimpleDateFormat dtf = new SimpleDateFormat("yyyy-MM-dd");
+				System.out.println("idReserva: " + idReserva);
+				
+				if(idReserva == 0) {
+					rta = cs.new Respuesta("Factura del " + dtf.format(rs.getDate("FECHA_CREACION")));
+					rta.agregarDato("Fecha de pago", dtf.format(FechaUltimoPago));
+					rta.agregarDato("Pagado", "" + rs.getDouble("PAGADO"));
+					rta.agregarDato("Concepto", rs.getString("CONCEPTO"));
+					rta.agregarDato("Operador que facturó", "" + rs.getLong("ID_OPERADOR"));
+					respuestas.add(rta);
+				}
+
+				else{
+					Date inicio = rs.getDate("FECHA_INIC");
+					Date fin = rs.getDate("FECHA_FINA");
+					rta = cs.new Respuesta("Reserva para el día " + dtf.format(inicio));
+
+					long diff = Math.abs(fin.getTime() - inicio.getTime());
+					Long diffDays = diff / (24 * 60 * 60 * 1000);
+					rta.agregarDato("Fecha de terminación de reserva", dtf.format(fin));
+					rta.agregarDato("numero días reserva", diffDays.toString());
+
+					int tipo = rs.getInt("TIPO");
+					String sTipo = "";
+					switch (tipo) {
+					case Propuesta.HABITACION_SENCILLA:
+						sTipo = "habitación sencilla";
+						break;
+					case Propuesta.HABITACION_COMPARTIDA:
+						sTipo = "Habitación compartida";
+						break;
+					case Propuesta.HABITACION_SUITE_SENCILLA:
+						sTipo = "Habitación suite sencilla";
+						break;
+					case Propuesta.HABITACION_SUITE_COMPARTIDA:
+						sTipo = "Habitación suite compartida";
+						break;
+					case Propuesta.HABITACION_SEMI_SUITE_SENCILLA:
+						sTipo = "Habitación semi suite sencilla";
+						break;
+					case Propuesta.HABITACION_SEMI_SUITE_COMPARTIDA:
+						sTipo = "Habitación semi suite compartida";
+						break;
+					default:
+						sTipo = "Otro";
+						break;
+					}
+					rta.agregarDato("Nombre propuesta", rs.getString("NOMBRE"));
+					rta.agregarDato("Tipo Alojamiento", sTipo);
+					rta.agregarDato("Costo", ""+rs.getDouble("COSTO"));
+					rta.agregarDato("Días permitidos de cancelación", ""+rs.getInt("DIAS_CANCELACION"));
+					respuestas.add(rta);
+
+				}
+
+			}
+
+		}catch (SQLException e) {
+			if(conexionPropia)
+				this.conn.rollback();
+			System.err.println("SQLException:" + e.getMessage());
+			e.printStackTrace();
+			throw e;
+		} catch (Exception e) {
+			if(conexionPropia)
+				this.conn.rollback();
+			System.err.println("GeneralException:" + e.getMessage());
+			e.printStackTrace();
+			throw e;
+		} finally {
+			try {
+				dao.cerrarRecursos();
+				if(this.conn!=null && conexionPropia)
+					this.conn.close();
+			} catch (SQLException exception) {
+				System.err.println("SQLException closing resources:" + exception.getMessage());
+				exception.printStackTrace();
+				throw exception;
+			}
+		}
+
+		return respuestas;
 	}
 
 	public String[] reqConsSiete(String tiempo, Integer unidad) throws SQLException, Exception{
@@ -1612,7 +1828,7 @@ public class AlohAndesTM {
 				this.conn.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
 				this.savepoint = this.conn.setSavepoint();
 			}
-			
+
 			dao.setConn(conn);
 			int tem = tiempo.equalsIgnoreCase("day")? 1 : tiempo.equalsIgnoreCase("week") ? 2 : tiempo.equalsIgnoreCase("month") ? 3 : tiempo.equalsIgnoreCase("year") ? 4: 0;
 
@@ -1651,11 +1867,11 @@ public class AlohAndesTM {
 
 			Date diaMayorDemanda = new Date();
 			int cantMaximaDemanda = 0;
-			
+
 			Date diaMayorIngreso = new Date();
 			Double  cantMAyorIngreso = 0.0;
 			while(ite >= 0) {
-				
+
 				//Mayor Demanda
 				c.add(Calendar.DATE, ite);
 				Date act = c.getTime();
@@ -1664,7 +1880,7 @@ public class AlohAndesTM {
 					diaMayorDemanda = act;
 					cantMaximaDemanda = cantAct;
 				}
-				
+
 				//Mayor Ingreso
 				c.add(Calendar.DATE, ite*(-1));
 				act = c.getTime();
@@ -1673,16 +1889,16 @@ public class AlohAndesTM {
 					diaMayorIngreso = act;
 					cantMAyorIngreso = ingAct;
 				}
-				
+
 				ite--;
 			}
 
 			if(conexionPropia)
 				this.conn.commit();
-			
+
 			ret[0] = dtf.format(diaMayorDemanda);
 			ret[1] = dtf.format(diaMayorIngreso);
-			
+
 		}catch (SQLException e) {
 			if(conexionPropia)
 				this.conn.rollback();
@@ -1707,10 +1923,73 @@ public class AlohAndesTM {
 				throw exception;
 			}
 		}
-		
+
 		return ret;
 	}
 
+	
+
+	public Respuesta reqConsSieteMejorado(ConsultasRest cs, String tiempo) throws SQLException, Exception{
+		boolean conexionPropia = false;
+		DAOTablaReservas dao = new DAOTablaReservas();
+		Respuesta rta;
+		try {
+			if (this.conn == null || this.conn.isClosed()) {
+				this.conn = darConexion(); 
+				conexionPropia = true; 
+				this.conn.setAutoCommit(false);
+				this.conn.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
+				this.savepoint = this.conn.setSavepoint();
+			}
+
+			dao.setConn(conn);
+			int tem = tiempo.equalsIgnoreCase("day")? 1 : tiempo.equalsIgnoreCase("week") ? 2 : tiempo.equalsIgnoreCase("month") ? 3 : tiempo.equalsIgnoreCase("year") ? 4: 0;
+
+			if(tem == 0)
+				throw new Exception("El tiempo, " + tiempo +  ", no es correcto");
+
+		
+			SimpleDateFormat dtf = new SimpleDateFormat("yyyy-MM-dd");
+			Calendar c = Calendar.getInstance();
+			c.setTime(new Date());
+
+		
+			
+			ResultSet rs = dao.reqConsSiete(tem);
+			
+			rta = cs.new Respuesta("Mejor fecha");
+			rta.agregarDato(tiempo, tiempo + rs.getInt("HOLA"));
+			
+			
+
+		}catch (SQLException e) {
+			if(conexionPropia)
+				this.conn.rollback();
+			System.err.println("SQLException:" + e.getMessage());
+			e.printStackTrace();
+			throw e;
+		} catch (Exception e) {
+			if(conexionPropia)
+				this.conn.rollback();
+			System.err.println("GeneralException:" + e.getMessage());
+			e.printStackTrace();
+			throw e;
+		} finally {
+			try {
+
+				dao.cerrarRecursos();
+				if(this.conn!=null && conexionPropia)
+					this.conn.close();
+			} catch (SQLException exception) {
+				System.err.println("SQLException closing resources:" + exception.getMessage());
+				exception.printStackTrace();
+				throw exception;
+			}
+		}
+
+		return rta;
+	}
+	
 
 
 	private boolean reubicarCancelarReserva(Reserva res) throws SQLException, Exception{
@@ -1950,6 +2229,7 @@ public class AlohAndesTM {
 
 		return false;
 	}
+
 
 
 
